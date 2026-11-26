@@ -43,4 +43,6 @@ From the repository root: `npm run setup`, then `npm run dev`; open http://127.0
 - The sandbox refresh error affected tool execution, not project commands. Workspace setup and all checks ran using reviewed elevated execution; the independent clean checkout passed without repository ownership warnings.
 - No implementation blocker remains for Phase 0. Wait for the team to say **continue** before any Phase 1 work.
 
-Pilot routes are intentionally undecided. Ask for two or three intersecting real routes before Phase 1.
+### Follow-up checklist review
+
+Rechecked the repeated Phase 0 requirements against the existing files. No application changes were needed; the full-suite and browser results above remain the latest execution results. Updated the formerly blank pilot notes with the three routes supplied by the team in chat; see `data/README.md`. Those route details are unverified and have not been imported. Phase 1 remains unstarted.
