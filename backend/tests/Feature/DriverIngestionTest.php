@@ -135,6 +135,27 @@ class DriverIngestionTest extends TestCase
         $this->assertDatabaseCount('location_pings', 1);
     }
 
+    public function test_duplicate_identity_normalizes_uuid_case_numeric_values_and_timezone(): void
+    {
+        $row = $this->ping();
+        $this->send([$row])->assertJsonPath('data.counts.accepted', 1);
+        $retry = array_replace($row, ['client_ping_uuid' => strtoupper($row['client_ping_uuid']),
+            'lat' => '14.65', 'recorded_at' => now()->setTimezone('Asia/Manila')->toIso8601String()]);
+        $this->send([$retry])->assertJsonPath('data.counts.duplicates', 1);
+        $this->assertDatabaseCount('location_pings', 1);
+    }
+
+    public function test_a_uuid_cannot_be_reused_for_a_different_trip(): void
+    {
+        $row = $this->ping();
+        $this->send([$row])->assertJsonPath('data.counts.accepted', 1);
+        $this->postJson('/api/driver/trips/'.$this->trip()->id.'/end')->assertOk();
+        $response = $this->postJson('/api/driver/trips/start', $this->consent())->assertCreated();
+        $this->trip = Trip::findOrFail($response->json('data.id'));
+        $this->send([$row])->assertJsonPath('data.results.0.code', 'uuid_conflict');
+        $this->assertDatabaseCount('location_pings', 1);
+    }
+
     public function test_bad_accuracy_is_rejected_but_valid_rows_in_the_same_batch_survive(): void
     {
         config(['commutelive.ping_max_accuracy_m' => 20]);
@@ -211,8 +232,13 @@ class DriverIngestionTest extends TestCase
         $this->travel(301)->seconds();
         $this->send([$this->ping()]);
         $this->getJson('/api/vehicles')->assertJsonPath('data.0.occupancy', 'unknown');
+        $this->putJson('/api/driver/status', ['trip_id' => $trip->id, 'occupancy' => 'full'])->assertOk();
         $this->postJson("/api/driver/trips/{$trip->id}/end");
         $this->putJson('/api/driver/status', ['trip_id' => $trip->id, 'occupancy' => 'seats'])->assertStatus(409);
+        $response = $this->postJson('/api/driver/trips/start', $this->consent())->assertCreated();
+        $this->trip = Trip::findOrFail($response->json('data.id'));
+        $this->send([$this->ping()])->assertOk();
+        $this->getJson('/api/vehicles')->assertJsonPath('data.0.occupancy', 'unknown');
     }
 
     public function test_incidents_derive_identity_route_and_expiry_from_the_active_trip(): void
@@ -233,5 +259,33 @@ class DriverIngestionTest extends TestCase
         $this->artisan('commutelive:build-segments', ['--route' => $this->route->code])->assertFailed();
         config(['commutelive.segment_length_m' => 250]);
         $this->artisan('commutelive:build-segments', ['--route' => $this->route->code])->assertSuccessful();
+    }
+
+    public function test_real_classified_vehicle_pings_are_not_automatically_labeled_simulated(): void
+    {
+        $this->route->update(['is_simulated' => false]);
+        $this->vehicle->update(['is_simulated' => false]);
+        $response = $this->postJson('/api/driver/trips/start', $this->consent())->assertCreated()->assertJsonPath('data.is_simulated', false);
+        $this->trip = Trip::findOrFail($response->json('data.id'));
+        $this->send([$this->ping()])->assertJsonPath('data.results.0.is_simulated', false);
+        $this->getJson('/api/vehicles')->assertJsonPath('contains_simulated_data', false)->assertJsonPath('data.0.is_simulated', false);
+    }
+
+    public function test_inactive_routes_and_missing_segments_cannot_start_tracking(): void
+    {
+        $this->route->update(['is_active' => false]);
+        $this->postJson('/api/driver/trips/start', $this->consent())->assertStatus(409);
+        $this->route->update(['is_active' => true]);
+        $this->route->segments()->delete();
+        $this->postJson('/api/driver/trips/start', $this->consent())->assertStatus(409);
+        $this->assertDatabaseCount('trips', 0);
+    }
+
+    public function test_expired_uploads_and_impossible_speed_or_heading_are_rejected(): void
+    {
+        $this->send([$this->ping(['recorded_at' => now()->subDays(31)->toIso8601String()]),
+            $this->ping(['speed_kph' => config('commutelive.ping_max_speed_kph') + 1]), $this->ping(['heading' => 360])])
+            ->assertJsonPath('data.results.0.code', 'expired_ping')->assertJsonPath('data.results.1.code', 'invalid_ping')->assertJsonPath('data.results.2.code', 'invalid_ping');
+        $this->assertDatabaseCount('location_pings', 0);
     }
 }

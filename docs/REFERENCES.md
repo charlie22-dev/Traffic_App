@@ -22,3 +22,7 @@ The projects listed in the build brief remain candidates for review. Before rely
 - [OSM tile policy](https://operations.osmfoundation.org/policies/tiles/): standard HTTPS tile URL and visible attribution; browser caching is retained. No bulk downloads, tile prefetching or geocoding. Basemap can be turned off; route geometry remains viewable.
 - [Sakay GTFS repository](https://github.com/sakayph/gtfs), [README](https://github.com/sakayph/gtfs/blob/master/README.md) and [license](https://github.com/sakayph/gtfs/blob/master/LICENSE.md): inspected historical feed structure and custom DOTC terms, which are not an MIT code license. No shapes/stops/code were imported or mixed into OSM-derived data. The feed is a historical hint only.
 - Direct OSM API snapshots for relations [11246064](https://www.openstreetmap.org/relation/11246064) and [11246065](https://www.openstreetmap.org/relation/11246065): rejected as substitutes after inspecting their current names and termini. See source notes.
+
+## Phase 2
+
+The auth/ingestion implementation is original application code using the existing MIT-licensed Laravel/Sanctum dependencies. Verified the installed Sanctum 4.5.0 `HasApiTokens::createToken` expiry signature before use. No code from the inspiration applications was copied. The separate demo geometry is a fictional straight test line created for local verification, not an imported OSM/GTFS route or measured vehicle trace; its provenance and simulation flags are explicit.

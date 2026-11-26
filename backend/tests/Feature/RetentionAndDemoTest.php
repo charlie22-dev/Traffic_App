@@ -51,6 +51,9 @@ class RetentionAndDemoTest extends TestCase
         $this->assertSame(2, Vehicle::where('is_simulated', true)->count());
         $this->assertTrue(Route::first()->is_simulated);
         $this->getJson('/api/routes')->assertJsonPath('data.0.is_simulated', true);
+        Trip::factory()->create(['vehicle_id' => Vehicle::first()->id]);
+        $this->seed(DemoSeeder::class);
+        $this->assertDatabaseCount('vehicles', 2);
     }
 
     public function test_remaining_data_model_factories_can_create_simulated_evaluation_records(): void
@@ -58,5 +61,27 @@ class RetentionAndDemoTest extends TestCase
         $this->assertTrue(SegmentBaseline::factory()->create()->is_simulated);
         $this->assertTrue(SegmentSpeedStat::factory()->create()->is_simulated);
         $this->assertTrue(EtaPrediction::factory()->create()->is_simulated);
+    }
+
+    public function test_purge_is_scheduled_daily(): void
+    {
+        $event = collect(app(\Illuminate\Console\Scheduling\Schedule::class)->events())
+            ->first(fn ($event) => str_contains($event->command ?? '', 'commutelive:purge-pings'));
+        $this->assertNotNull($event);
+        $this->assertSame('0 0 * * *', $event->expression);
+    }
+
+    public function test_demo_seeder_refuses_to_overwrite_reserved_non_demo_data(): void
+    {
+        config(['commutelive.demo_password' => 'test-only-demo-password']);
+        \App\Models\Stop::factory()->create(['code' => 'DEMO-STOP-1', 'is_simulated' => false]);
+        try {
+            $this->seed(DemoSeeder::class);
+            $this->fail('Demo seeding must reject a non-demo identity collision.');
+        } catch (\RuntimeException $exception) {
+            $this->assertStringContainsString('non-demo data', $exception->getMessage());
+        }
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('stops', 1);
     }
 }

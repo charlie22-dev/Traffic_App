@@ -3,6 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Vehicle;
+use App\Models\Trip;
+use App\Models\LocationPing;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -57,5 +60,19 @@ class AuthApiTest extends TestCase
             $this->postJson('/api/login', ['email' => 'missing@example.test', 'password' => 'wrong'])->assertUnprocessable();
         }
         $this->postJson('/api/login', ['email' => 'missing@example.test', 'password' => 'wrong'])->assertStatus(429)->assertHeader('Retry-After');
+    }
+
+    public function test_logout_ends_the_active_trip_and_removes_public_visibility(): void
+    {
+        $user = User::factory()->driver()->create();
+        $vehicle = Vehicle::factory()->create(['driver_id' => $user->id]);
+        $trip = Trip::factory()->create(['vehicle_id' => $vehicle->id]);
+        LocationPing::factory()->create(['trip_id' => $trip->id]);
+        $token = $user->createToken('logout-test', ['driver'])->plainTextToken;
+        $this->getJson('/api/vehicles')->assertJsonCount(1, 'data');
+        $this->withToken($token)->postJson('/api/logout')->assertOk()->assertJsonPath('tracking_on', false);
+        $this->assertNotNull($trip->fresh()->ended_at);
+        $this->assertNull($trip->fresh()->active_driver_id);
+        $this->getJson('/api/vehicles')->assertJsonCount(0, 'data');
     }
 }

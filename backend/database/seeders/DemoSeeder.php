@@ -29,6 +29,10 @@ class DemoSeeder extends Seeder
                 throw new RuntimeException('A reserved demo email belongs to a non-demo account; no demo users were changed.');
             }
         }
+        if (Stop::whereIn('code', ['DEMO-STOP-1', 'DEMO-STOP-2'])->where('is_simulated', false)->exists()
+            || Vehicle::whereIn('label', ['SIM-JEEP-01', 'SIM-JEEP-02'])->where('is_simulated', false)->exists()) {
+            throw new RuntimeException('A reserved demo stop/vehicle identity belongs to non-demo data; nothing was seeded.');
+        }
         DB::transaction(function () use ($accounts, $password) {
             foreach ($accounts as $name => $role) {
                 $user = User::firstOrNew(['email' => $name.'@commutelive.test']);

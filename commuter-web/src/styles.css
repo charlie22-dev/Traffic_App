@@ -25,8 +25,9 @@ a { color: #175a85; text-underline-offset: .2em; }
 .review-page header { justify-content: space-between; flex-wrap: wrap; font-size: 1rem; }
 .review-page h1 { font-size: clamp(2rem, 5vw, 3.5rem); margin-top: 2.5rem; }
 .review-controls { display: flex; gap: 1.25rem; flex-wrap: wrap; align-items: end; margin: 1.5rem 0; }
-.review-controls label { display: grid; gap: .4rem; font-weight: 650; max-width: 100%; }
+.review-controls label { display: grid; gap: .4rem; font-weight: 650; max-width: 100%; min-width: 0; }
 select { font: inherit; max-width: 100%; padding: .7rem; background: white; border: 1px solid #90a9a1; border-radius: .5rem; }
+.review-controls select { width: 100%; min-width: 0; }
 .review-controls .checkbox { display: flex; align-items: center; padding: .65rem 0; font-weight: 400; }
 .checkbox input { width: 1.25rem; height: 1.25rem; accent-color: #123c35; }
 .review-notice { background: #fff3d9; border: 1px solid #c59b42; padding: 1rem; border-radius: .6rem; }

@@ -84,7 +84,7 @@ The team subsequently supplied wiki road sequences for T104 and reference servic
 
 Use `npm.cmd run dev` and open http://127.0.0.1:5173/routes (or open that URL in the already-running development server). The default view is an honest empty-data state. Follow `data/README.md` to supply the six direction Features and actual stops. After importing and segmenting them, repeat idempotency/API checks against the actual dataset and visually check a real approved pilot route before marking Phase 1 complete. Phase 2 has not begun.
 
-## Phase 2 — in progress
+## Phase 2 — complete for the approved synthetic demonstration (2026-11-26)
 
 The team explicitly requested Phase 2 while the Phase 1 real-data gate remains open, and approved a separate synthetic demo dataset. Phase 1 is not marked complete. Phase 2 tests and demonstration must distinguish synthetic evidence from real-route validation.
 
@@ -94,12 +94,24 @@ The team explicitly requested Phase 2 while the Phase 1 real-data gate remains o
 - Public vehicles use the latest matched ping by recorded time, filter stale data after 60 seconds by default, and expose no driver name/email. Ended trips stay hidden even when queued pings recorded during the trip arrive afterward. Occupancy expires independently; incidents expire from public responses.
 - Added daily scheduled `commutelive:purge-pings` with a dry-run and 30-day default. Actual scheduler execution must be configured by the operator.
 - Added idempotent local-only demo seeding: 1 synthetic admin, 2 synthetic drivers, 1 synthetic commuter, 2 simulated vehicles and a separately named fictional test line. All demo data is marked simulated. Generated credentials stay in ignored `.env`; none are committed or printed.
-- Initial real HTTP demo succeeded through login, tracking ON, one accepted ping, one duplicate, occupancy and a public matched vehicle with `is_simulated=true`. Final cleanup and full-suite verification are being completed.
+- Real HTTP demonstration passed twice, including repeat seeding after existing trip history. Each run logged in, consented to tracking ON, accepted one ping, identified its duplicate, updated occupancy, returned a matched simulated vehicle publicly, ended the trip, confirmed it was hidden and revoked its token. Cleanup audit: **0 open simulated trips and 0 demo tokens**, with 2 explicitly simulated ping rows retained for the normal retention window.
+- Final full suite passed: **79 tests** (59 backend / 317 assertions, 13 React, 1 Flutter widget, 2 simulator HTTP, 4 source-script), Flutter analysis, web production build and real HTTP smoke checks. SQLite/PHP 8.2 were used locally; PHP 8.3 CI and MySQL load testing have not run here.
+- Edge at a 390 px viewport verified the actual seeded demo's **Simulated data** badge, fictional-data warning, five segments/two stops, basemap toggle and no page errors/overflow. The long direction selector initially overflowed; constrained its minimum/maximum sizing and reran browser verification successfully.
+- Verified `commutelive:purge-pings --dry-run` against the dev database: 0 expired rows; it deleted nothing. Verified the daily purge appears in `schedule:list`. Root dev does not start a scheduler automatically; operations are documented in `docs/API.md`.
+- Added a demo collision safeguard so reserved demo stop/vehicle identities cannot overwrite non-demo data. Passwords/tokens remain outside tracked files. The team's existing development servers were left running; test/demo-owned servers stopped.
 
 ### Phase gate
 
-- [ ] Feature tests cover ingestion, duplicates, accuracy, off-route flags, auth and role rules.
-- [ ] A real HTTP sample batch creates a visible, explicitly simulated vehicle and cleans up tracking afterward.
-- [ ] Ping purge exists and passes boundary/configuration tests.
-- [ ] Full repository suite passes.
-- [ ] Demo simulation label checked in the browser.
+- [x] Feature tests cover ingestion, duplicates, accuracy, off-route flags, auth and role rules.
+- [x] A real HTTP sample batch creates a visible, explicitly simulated vehicle and cleans up tracking afterward.
+- [x] Ping purge exists and passes boundary/configuration tests.
+- [x] Full repository suite passes.
+- [x] Demo simulation label checked in the browser.
+
+### Run and review
+
+`npm.cmd run demo:ingestion` holds the synthetic trip ON for 15 seconds and prints its live JSON/review URLs before cleanup. For a fast repeat use `npm.cmd run demo:ingestion -- --hold-seconds 0`. For persistent ordinary local development, `npm.cmd run dev` serves http://127.0.0.1:5173/routes with the seeded demo line visibly labeled. Request/response/retention details are in `docs/API.md`.
+
+### Remaining limits and questions
+
+Phase 1's actual pilot geometry/stops still need source data and visual validation. The synthetic line does not resolve that gate or provide measured traffic/ETA accuracy. Real Flutter tracking, permissions and persistent notifications remain in the driver-app phase. No field GPS collection or MySQL concurrent load test was performed. Configure the scheduler to enforce daily retention in any running deployment. Wait for **continue** before Phase 3.

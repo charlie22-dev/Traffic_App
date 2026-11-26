@@ -13,3 +13,12 @@ Later phases add simulation-label, consent, retention, GPS validation, route mat
 - Source scripts: correctly orient connected OSM ways, respect explicit member direction, ignore platform ways and reject gaps/missing geometry.
 - UI: loading/empty/error/retry/racing direction responses; show provenance warnings; distinguish segment colors from traffic. Browser QA uses intercepted synthetic fixture responses only, never imports those into the real database.
 - Actual-data gate: import the three approved services in both directions, reimport without duplicates and visually review at least one actual pilot path and its segment boundaries on Leaflet. This remains pending while source geometry/stops are missing; passing fixture tests does not satisfy it.
+
+## Phase 2
+
+- Real Sanctum tokens: registration/privilege restrictions, hashing, login/logout, expiry/revocation and login throttling.
+- Driver authorization: role rules, vehicle/trip ownership, explicit current-version consent, one active driver/vehicle trip, idempotent end and immediate hiding at end/logout.
+- Ingestion: matched batches, stable UUID deduplication and conflicts, normalized UUID/numeric/timezone retries, quality checks, off-route flags, immutable route history, bounded/rate-limited batches, client timestamp limits and per-row outcomes.
+- Visibility/privacy: latest recording wins over delayed uploads, exact freshness boundary, no driver identity on public responses, simulation flags, occupancy expiry/trip isolation, incident identity/expiry, queued uploads after trip end stay hidden.
+- Retention/demo: purge dry-run, exact cutoff and invalid settings; daily schedule registration; idempotent synthetic seeder and model factories. The real local HTTP demo must show a matched vehicle and then turn tracking OFF/clean up its token.
+- Browser: actual seeded fictional line displays **Simulated data**, five segments and two stops at mobile width, with no page errors or horizontal page overflow. No physical device GPS is used.
