@@ -1,0 +1,22 @@
+:root { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #123c35; background: #f2f6f5; font-synthesis: none; line-height: 1.6; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 66rem; margin: auto; padding: 2rem 1.5rem; }
+header { display: flex; align-items: center; gap: .7rem; font-size: 1.25rem; font-weight: 750; }
+.brand-mark { display: grid; place-items: center; width: 2.4rem; height: 2.4rem; background: #123c35; color: white; border-radius: .75rem; }
+.intro { max-width: 44rem; padding-top: clamp(2.5rem, 8vw, 6rem); }
+.eyebrow { font-size: .875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+h1 { font-size: clamp(2.4rem, 6vw, 4.25rem); line-height: 1.12; letter-spacing: -.045em; margin: 1rem 0 1.5rem; }
+.description { font-size: 1.125rem; max-width: 35rem; color: #435e58; }
+.connection { background: white; border: 1px solid #cdded8; border-radius: 1.2rem; padding: 1.5rem; margin-top: 2rem; }
+.connection .eyebrow { margin-top: 0; }
+h2 { font-size: 1.8rem; margin: .25rem 0; }
+.connection p { margin-bottom: 1rem; }
+button { border: 0; border-radius: .6rem; background: #123c35; color: white; font: inherit; font-weight: 650; padding: .75rem 1.2rem; min-height: 2.75rem; cursor: pointer; }
+button:hover { background: #225a50; }
+button:focus-visible { outline: 3px solid #cf7600; outline-offset: 4px; }
+button:disabled { opacity: .6; cursor: wait; }
+.scope, footer { color: #526b64; font-size: .875rem; }
+.scope { margin-top: 1.5rem; }
+footer { margin-top: 3rem; }
+@media (prefers-reduced-motion: no-preference) { button { transition: background .15s; } }
