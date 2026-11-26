@@ -42,6 +42,16 @@ describe('route data review', () => {
     expect(await screen.findByText(/No source-backed route data/)).toBeInTheDocument();
   });
 
+  it('labels a simulated route explicitly', async () => {
+    vi.stubGlobal('fetch', vi.fn(url => {
+      if (url === '/api/routes') return respond({ data: [{ ...route, is_simulated: true }] });
+      if (url.endsWith('/segments')) return respond({ data: [] });
+      return respond({ data: { ...route, is_simulated: true } });
+    }));
+    render(<RouteReview />);
+    expect(await screen.findByText('Simulated data')).toBeInTheDocument();
+  });
+
   it('does not show a stale direction when changing selection during a pending request', async () => {
     let resolveFirst;
     vi.stubGlobal('fetch', vi.fn(url => {

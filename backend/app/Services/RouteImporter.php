@@ -106,8 +106,11 @@ final class RouteImporter
         return DB::transaction(function () use ($features, $rows) {
             foreach ($features as $code => $feature) {
                 $properties = $feature['properties'];
-                $existing = Route::where('code', $code)->first();
+                $existing = Route::where('code', $code)->lockForUpdate()->first();
                 $geometryChanged = $existing && $existing->geometry_geojson !== $feature['geometry'];
+                if ($geometryChanged && $existing->trips()->exists()) {
+                    throw new InvalidArgumentException('This route has trip history. Use a new route version/code instead of changing its geometry.');
+                }
                 $route = Route::updateOrCreate(['code' => $code], [
                     'name' => $properties['name'], 'mode' => $properties['mode'],
                     'direction' => $properties['direction'], 'color' => $properties['color'],

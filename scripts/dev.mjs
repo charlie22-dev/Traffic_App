@@ -12,7 +12,7 @@ async function checkPort(port) {
   });
 }
 
-export async function startDev({ apiPort = 8000, webPort = 5173 } = {}) {
+export async function startDev({ apiPort = 8000, webPort = 5173, handleSignals = true } = {}) {
   apiPort = await checkPort(apiPort);
   webPort = await checkPort(webPort);
   if (apiPort === webPort) webPort = await checkPort(0);
@@ -43,8 +43,10 @@ export async function startDev({ apiPort = 8000, webPort = 5173 } = {}) {
     });
   }
   const onSignal = () => { close(); resolveDone(); };
-  process.once('SIGINT', onSignal);
-  process.once('SIGTERM', onSignal);
+  if (handleSignals) {
+    process.once('SIGINT', onSignal);
+    process.once('SIGTERM', onSignal);
+  }
   console.log(`\nCommuteLive: ${webUrl} | API: ${apiUrl}/api/health\nPress Ctrl+C to stop both servers.`);
   return { done, apiUrl, webUrl, close: () => {
     close();

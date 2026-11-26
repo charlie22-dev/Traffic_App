@@ -10,7 +10,7 @@ class RouteController extends Controller
     public function index(): JsonResponse
     {
         return response()->json(['data' => Route::where('is_active', true)
-            ->select(['id', 'code', 'name', 'mode', 'direction', 'color', 'length_m', 'verification_status', 'source_metadata'])
+            ->select(['id', 'code', 'name', 'mode', 'direction', 'color', 'length_m', 'verification_status', 'source_metadata', 'is_simulated'])
             ->withCount(['stops', 'segments'])->orderBy('code')->get()]);
     }
 
@@ -22,7 +22,7 @@ class RouteController extends Controller
             'id' => $stop->id, 'code' => $stop->code, 'name' => $stop->name,
             'lat' => $stop->lat, 'lng' => $stop->lng, 'sequence' => (int) $stop->pivot->sequence,
             'distance_along_route_m' => (float) $stop->pivot->distance_along_route_m,
-            'offset_m' => (float) $stop->pivot->offset_m, 'verification_status' => $stop->verification_status, 'source' => $stop->source,
+            'offset_m' => (float) $stop->pivot->offset_m, 'verification_status' => $stop->verification_status, 'source' => $stop->source, 'is_simulated' => $stop->is_simulated,
         ]);
 
         return response()->json(['data' => $data]);

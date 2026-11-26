@@ -71,6 +71,7 @@ export default function RouteReview() {
       {error && <p role="alert">{error}</p>}
       {!loading && !error && routes.length === 0 && <p role="status">No source-backed route data has been imported. Complete the GeoJSON and stops.csv, then run the import and build-segments commands.</p>}
       {detail && <>
+        {detail.is_simulated && <p className="simulation-badge" role="status">Simulated data</p>}
         <div className="review-notice" role="note">
           <strong>{detail.verification_status === 'field_verified' ? 'Recorded as field verified' : 'Needs local verification'}</strong>
           <p>{detail.source_metadata.notes || 'OSM or imported source data does not establish current service operation or legal boarding locations.'}</p>

@@ -83,3 +83,23 @@ The team subsequently supplied wiki road sequences for T104 and reference servic
 ### Review and next step
 
 Use `npm.cmd run dev` and open http://127.0.0.1:5173/routes (or open that URL in the already-running development server). The default view is an honest empty-data state. Follow `data/README.md` to supply the six direction Features and actual stops. After importing and segmenting them, repeat idempotency/API checks against the actual dataset and visually check a real approved pilot route before marking Phase 1 complete. Phase 2 has not begun.
+
+## Phase 2 — in progress
+
+The team explicitly requested Phase 2 while the Phase 1 real-data gate remains open, and approved a separate synthetic demo dataset. Phase 1 is not marked complete. Phase 2 tests and demonstration must distinguish synthetic evidence from real-route validation.
+
+- Added all remaining starting-model tables/models/factories, plus user roles, explicit consent records on trips, stable active-trip constraints, simulation flags and ping quality/deduplication fields.
+- Added Sanctum register/login/logout, driver role middleware, assigned-vehicle discovery, consented trip start/end, batch pings, occupancy updates, driver incidents and public live feeds.
+- GPS batches return per-row accepted/flagged/rejected/duplicate outcomes. Bad accuracy is rejected; off-route points are stored as flagged diagnostics with no segment assignment and excluded from public positions. UUID payload conflicts cannot overwrite existing data. Matching uses the trip's route; history prevents geometry/layout mutation.
+- Public vehicles use the latest matched ping by recorded time, filter stale data after 60 seconds by default, and expose no driver name/email. Ended trips stay hidden even when queued pings recorded during the trip arrive afterward. Occupancy expires independently; incidents expire from public responses.
+- Added daily scheduled `commutelive:purge-pings` with a dry-run and 30-day default. Actual scheduler execution must be configured by the operator.
+- Added idempotent local-only demo seeding: 1 synthetic admin, 2 synthetic drivers, 1 synthetic commuter, 2 simulated vehicles and a separately named fictional test line. All demo data is marked simulated. Generated credentials stay in ignored `.env`; none are committed or printed.
+- Initial real HTTP demo succeeded through login, tracking ON, one accepted ping, one duplicate, occupancy and a public matched vehicle with `is_simulated=true`. Final cleanup and full-suite verification are being completed.
+
+### Phase gate
+
+- [ ] Feature tests cover ingestion, duplicates, accuracy, off-route flags, auth and role rules.
+- [ ] A real HTTP sample batch creates a visible, explicitly simulated vehicle and cleans up tracking afterward.
+- [ ] Ping purge exists and passes boundary/configuration tests.
+- [ ] Full repository suite passes.
+- [ ] Demo simulation label checked in the browser.

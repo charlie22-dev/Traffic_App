@@ -55,7 +55,7 @@ export default function App() {
           </button>
         </div>
         <p><a href="/routes">Review pilot routes and segments</a></p>
-        <p className="scope">Route data setup. Live vehicles and ETAs are coming in later phases. No location is collected.</p>
+        <p className="scope">Route review and driver API setup. The commuter map with live vehicles and ETAs comes in a later phase. No commuter location is collected.</p>
       </section>
       <footer>Made for the daily sakay.</footer>
     </main>
