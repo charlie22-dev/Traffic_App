@@ -54,7 +54,8 @@ export default function App() {
             {status === 'loading' ? 'Checking…' : 'Check again'}
           </button>
         </div>
-        <p className="scope">Phase 0 · Setup only. Live vehicles, maps and ETAs are coming in later phases. No location is collected.</p>
+        <p><a href="/routes">Review pilot routes and segments</a></p>
+        <p className="scope">Route data setup. Live vehicles and ETAs are coming in later phases. No location is collected.</p>
       </section>
       <footer>Made for the daily sakay.</footer>
     </main>

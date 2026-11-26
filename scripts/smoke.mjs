@@ -28,6 +28,11 @@ try {
   assert.match(await app.text(), /API OK/);
   const unauthorized = await fetch('http://127.0.0.1:5173/api/user', { headers: { Accept: 'application/json' } });
   assert.equal(unauthorized.status, 401);
+  const routes = await fetch('http://127.0.0.1:5173/api/routes');
+  assert.equal(routes.status, 200);
+  assert.ok(Array.isArray((await routes.json()).data), 'Routes must return a JSON data array');
+  const review = await fetch('http://127.0.0.1:5173/routes');
+  assert.equal(review.status, 200);
   console.log('HTTP smoke passed: React served, Laravel health proxied, protected endpoint rejects anonymous access.');
 } finally {
   servers.close();

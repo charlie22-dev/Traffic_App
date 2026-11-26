@@ -1,0 +1,282 @@
+{
+  "version": "0.6",
+  "generator": "openstreetmap-cgimap 2.1.1 (2876028 spike-06.openstreetmap.org)",
+  "copyright": "OpenStreetMap and contributors",
+  "attribution": "http://www.openstreetmap.org/copyright",
+  "license": "http://opendatacommons.org/licenses/odbl/1-0/",
+  "elements": [
+    {
+      "type": "relation",
+      "id": 11246065,
+      "timestamp": "2026-08-31T10:23:19Z",
+      "version": 24,
+      "changeset": 188297633,
+      "user": "TagaSanPedroAko",
+      "uid": 2541613,
+      "members": [
+        {
+          "type": "node",
+          "ref": 7838633191,
+          "role": "platform_entry_only"
+        },
+        {
+          "type": "node",
+          "ref": 13176101525,
+          "role": "platform"
+        },
+        {
+          "type": "node",
+          "ref": 7838633190,
+          "role": "platform"
+        },
+        {
+          "type": "node",
+          "ref": 7657783368,
+          "role": "platform"
+        },
+        {
+          "type": "node",
+          "ref": 13176101524,
+          "role": "platform"
+        },
+        {
+          "type": "node",
+          "ref": 7838605583,
+          "role": "platform"
+        },
+        {
+          "type": "node",
+          "ref": 7657783367,
+          "role": "platform"
+        },
+        {
+          "type": "node",
+          "ref": 13176101522,
+          "role": "platform"
+        },
+        {
+          "type": "node",
+          "ref": 7838605582,
+          "role": "platform"
+        },
+        {
+          "type": "node",
+          "ref": 7657783366,
+          "role": "platform"
+        },
+        {
+          "type": "node",
+          "ref": 13176101521,
+          "role": "platform"
+        },
+        {
+          "type": "node",
+          "ref": 7838605581,
+          "role": "platform"
+        },
+        {
+          "type": "node",
+          "ref": 7657783362,
+          "role": "platform"
+        },
+        {
+          "type": "node",
+          "ref": 7838605580,
+          "role": "platform"
+        },
+        {
+          "type": "node",
+          "ref": 7838605579,
+          "role": "platform"
+        },
+        {
+          "type": "node",
+          "ref": 7838633197,
+          "role": "stop_entry_only"
+        },
+        {
+          "type": "way",
+          "ref": 1546420105,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 820063552,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 5051364,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 820063557,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 28595986,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 32003930,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 1296084564,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 1296084562,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 1503777466,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 1546420106,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 32003922,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 1296078361,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 840031293,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 5055399,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 782006516,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 5055419,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 29397239,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 379389868,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 933289326,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 933289325,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 904980044,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 643162726,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 643160796,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 27323187,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 1433666433,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 27323189,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 27276449,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 643170217,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 643170216,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 1123244160,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 879147763,
+          "role": ""
+        },
+        {
+          "type": "way",
+          "ref": 566523497,
+          "role": ""
+        }
+      ],
+      "tags": {
+        "bus": "share_taxi",
+        "charge": "15 PHP/4 km + 2.20 PHP/km",
+        "colour": "yellow",
+        "fee": "yes",
+        "from": "Leon Guinto",
+        "interval": "5",
+        "name": "Pandacan\u2013L. Guinto",
+        "network": "LTFRB National Capital Region",
+        "network:short": "LTFRB NCR",
+        "network:wikidata": "Q6483998",
+        "old_ref": "301;T3209",
+        "opening_hours": "Mo-Su 04:00-22:00",
+        "operator": "Pandacan Transport Service and Multi-Purpose Cooperative",
+        "operator:short": "PTSMPC",
+        "public_transport:version": "2",
+        "ref": "3193",
+        "route": "bus",
+        "to": "Pandacan",
+        "type": "route",
+        "wheelchair": "limited"
+      }
+    }
+  ]
+}

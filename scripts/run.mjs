@@ -35,8 +35,9 @@ async function test() {
   await run('flutter', ['analyze'], 'driver-app');
   await run('flutter', ['test'], 'driver-app');
   await run(python, ['-m', 'unittest', 'discover', '-s', 'tests', '-v'], 'simulator');
+  await run(python, ['-m', 'unittest', 'discover', '-s', 'data/scripts/tests', '-v']);
   await run(process.execPath, ['scripts/smoke.mjs']);
-  console.log('\nAll Phase 0 checks passed.');
+  console.log('\nAll automated checks passed. See docs/PROGRESS.md for phase acceptance gates.');
 }
 
 try {

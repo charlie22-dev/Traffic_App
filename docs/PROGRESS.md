@@ -46,3 +46,31 @@ From the repository root: `npm run setup`, then `npm run dev`; open http://127.0
 ### Follow-up checklist review
 
 Rechecked the repeated Phase 0 requirements against the existing files. No application changes were needed; the full-suite and browser results above remain the latest execution results. Updated the formerly blank pilot notes with the three routes supplied by the team in chat; see `data/README.md`. Those route details are unverified and have not been imported. Phase 1 remains unstarted.
+
+## Phase 1 — in progress; real pilot geometry and stops pending
+
+Goal: source-backed pilot directions, ordered stops and configurable segments in the database.
+
+- Retained all three supplied pilot services. The team explicitly chose to keep Malabon–Monumento terminals and flag the T104/MCU discrepancy.
+- Queried Overpass and cached 17 nearby transit relations. The successful query did not include exact matches for the supplied three services. A broader query returned HTTP 502; the public mirror timed out; a smaller refs query also returned HTTP 502. See `data/sources/README.md` for the evidence and reproducible commands.
+- Checked historical OSM relations 11246064 and 11246065 directly. They currently have different route names/termini, so neither was silently relabeled as an approved pilot route.
+- Inspected Sakay's GTFS README, file layout and custom DOTC license. It remains a historical hint, not an imported source of trusted geometry.
+- Added spherical haversine, finite-polyline projection and segmentation helpers. Tests cover before/after endpoints, far points, repeated vertices, bends, antimeridian/high latitudes, zero-length routes and invalid coordinates.
+- Added migrations/models, transactional `commutelive:import-routes`, idempotent `commutelive:build-segments`, and the three public route endpoints. Reimports retain route/stop/segment IDs; changed geometry invalidates old segments; malformed or off-route stops fail before writes.
+- Added the Leaflet `/routes` review page with direction selection, provenance warnings, ordered stops, segment popups, optional OSM basemap and an honest empty-data state. Colors distinguish segment boundaries, not traffic.
+- Added cached Overpass discovery and strict OSM exporter scripts. The exporter refuses mismatched identities/directions, disconnected ways and unnamed/missing stops. It does not reverse an outbound route to invent an inbound route.
+- Added `data/pilot.json` with six pending directions and `data/stops.csv` with the required header. No fabricated geometry or boarding points have been imported. Local schema migrations passed.
+- Current focused verification: 26 backend tests (105 assertions), 11 React tests and the web production build passed. Full-suite and browser review are pending.
+
+### Phase gate
+
+- [ ] All three actual pilot routes, both directions, have source-backed GeoJSON and stops loaded.
+- [x] Import and segment building are idempotent in automated fixture tests.
+- [x] Route list/detail/segment APIs return correct data in automated fixture tests.
+- [ ] A real approved pilot direction and its segments have been visually checked on Leaflet.
+- [x] Geometry tests including required edge cases pass.
+- [ ] Full repository suite passes with the final Phase 1 implementation.
+
+### Required input
+
+Asked the team for exact matching OSM relation IDs or manually traced travel directions and stop coordinates. Supplied road names and route names do not uniquely define the path, one-way return loops, stop order or boarding locations. Keep the phase incomplete until source data resolves this gap. Do not begin Phase 2.

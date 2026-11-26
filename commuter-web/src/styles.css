@@ -20,3 +20,20 @@ button:disabled { opacity: .6; cursor: wait; }
 .scope { margin-top: 1.5rem; }
 footer { margin-top: 3rem; }
 @media (prefers-reduced-motion: no-preference) { button { transition: background .15s; } }
+a { color: #175a85; text-underline-offset: .2em; }
+.review-page { max-width: 78rem; }
+.review-page header { justify-content: space-between; flex-wrap: wrap; font-size: 1rem; }
+.review-page h1 { font-size: clamp(2rem, 5vw, 3.5rem); margin-top: 2.5rem; }
+.review-controls { display: flex; gap: 1.25rem; flex-wrap: wrap; align-items: end; margin: 1.5rem 0; }
+.review-controls label { display: grid; gap: .4rem; font-weight: 650; max-width: 100%; }
+select { font: inherit; max-width: 100%; padding: .7rem; background: white; border: 1px solid #90a9a1; border-radius: .5rem; }
+.review-controls .checkbox { display: flex; align-items: center; padding: .65rem 0; font-weight: 400; }
+.checkbox input { width: 1.25rem; height: 1.25rem; accent-color: #123c35; }
+.review-notice { background: #fff3d9; border: 1px solid #c59b42; padding: 1rem; border-radius: .6rem; }
+.review-notice p { margin: .5rem 0 0; }
+.route-map { height: min(62vh, 38rem); min-height: 22rem; width: 100%; background: #e0e9e5; border: 1px solid #a4b9b0; border-radius: .7rem; }
+.table-scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; background: #fff; }
+th, td { padding: .75rem 1rem; border-bottom: 1px solid #cdded8; text-align: left; }
+th { white-space: nowrap; }
+.leaflet-container { font: inherit; }

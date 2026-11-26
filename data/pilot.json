@@ -1,0 +1,11 @@
+{
+  "status": "source_geometry_pending",
+  "directions": [
+    { "code": "MAL-MON-OUT", "name": "Malabon–Monumento via Letre", "direction": "Malabon to Monumento", "from_term": "Malabon", "to_term": "Monumento", "required_name_terms": ["Malabon", "Monumento"], "color": "#1565c0", "notes": "User retained Monumento endpoint; T104 is listed as Malabon–MCU in the OSM wiki. Do not silently extend to MCU." },
+    { "code": "MAL-MON-RETURN", "name": "Malabon–Monumento via Letre", "direction": "Monumento to Malabon", "from_term": "Monumento", "to_term": "Malabon", "required_name_terms": ["Malabon", "Monumento"], "color": "#1565c0", "notes": "User retained Monumento endpoint; supplied T104 identity remains disputed." },
+    { "code": "MON-NAV-OUT", "name": "Monumento–Navotas via Letre", "direction": "Monumento to Navotas", "from_term": "Monumento", "to_term": "Navotas", "required_name_terms": ["Monumento", "Navotas"], "color": "#7b1fa2" },
+    { "code": "MON-NAV-RETURN", "name": "Monumento–Navotas via Letre", "direction": "Navotas to Monumento", "from_term": "Navotas", "to_term": "Monumento", "required_name_terms": ["Monumento", "Navotas"], "color": "#7b1fa2" },
+    { "code": "GAS-REC-OUT", "name": "Gasak–Recto via Dagat-Dagatan and C-3", "direction": "Gasak to Recto", "from_term": "Gasak", "to_term": "Recto", "required_name_terms": ["Gasak", "Recto"], "color": "#00796b" },
+    { "code": "GAS-REC-RETURN", "name": "Gasak–Recto via Dagat-Dagatan and C-3", "direction": "Recto to Gasak", "from_term": "Recto", "to_term": "Gasak", "required_name_terms": ["Gasak", "Recto"], "color": "#00796b" }
+  ]
+}
