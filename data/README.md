@@ -18,6 +18,8 @@ Phase 1 infrastructure is implemented, but exact source-backed pilot geometry an
 
 Six direction codes are reserved in `pilot.json`: `MAL-MON-OUT`, `MAL-MON-RETURN`, `MON-NAV-OUT`, `MON-NAV-RETURN`, `GAS-REC-OUT`, `GAS-REC-RETURN`. Each direction needs its own actual path and stop sequence. `stops.csv` currently contains only its header; this is not a completed stop inventory.
 
+Phase 2 additionally has a separately seeded `DEMO-SYNTHETIC-OUT` fictional line for the explicitly approved ingestion demo. It lives in the database, carries simulation flags, and does not populate or replace any of these pilot GeoJSON/CSV files. Its endpoints are synthetic test points, not boarding recommendations.
+
 ## GeoJSON format
 
 Save a single GeoJSON Feature per direction under `routes/CODE.geojson`. The geometry must be a nonzero LineString in `[longitude, latitude]` order. For a geojson.io export, take the line Feature from its FeatureCollection and supply these properties:
