@@ -1,0 +1,8 @@
+{
+  "name": "normal",
+  "description": "Synthetic normal service; hour profile and a slower second segment apply.",
+  "traffic_multiplier": 1.0,
+  "segment_multipliers": {"*": {"2": 0.85}},
+  "incident": null,
+  "is_simulated": true
+}

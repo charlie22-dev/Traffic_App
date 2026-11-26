@@ -1,0 +1,8 @@
+{
+  "name": "rush_hour",
+  "description": "Synthetic congestion on top of the configured hour profile.",
+  "traffic_multiplier": 0.45,
+  "segment_multipliers": {"*": {"2": 0.55}},
+  "incident": null,
+  "is_simulated": true
+}

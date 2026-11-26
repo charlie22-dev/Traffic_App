@@ -8,6 +8,7 @@
     "dev": "node scripts/run.mjs dev",
     "test": "node scripts/run.mjs test",
     "smoke": "node scripts/smoke.mjs",
-    "demo:ingestion": "node scripts/demo-ingestion.mjs"
+    "demo:ingestion": "node scripts/demo-ingestion.mjs",
+    "demo:simulator": "node scripts/demo-simulator.mjs"
   }
 }

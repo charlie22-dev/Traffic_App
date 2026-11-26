@@ -34,6 +34,7 @@ Route::get('/privacy/tracking', fn () => response()->json(['data' => [
 
 Route::prefix('driver')->middleware(['auth:sanctum', 'role:driver'])->group(function () {
     Route::get('/vehicles', [DriverTripController::class, 'vehicles']);
+    Route::get('/trips/active', [DriverTripController::class, 'active']);
     Route::post('/trips/start', [DriverTripController::class, 'start'])->middleware('throttle:driver-updates');
     Route::post('/trips/{trip}/end', [DriverTripController::class, 'end'])->whereNumber('trip')->middleware('throttle:driver-updates');
     Route::post('/pings', [PingController::class, 'store'])->middleware('throttle:ingestion');

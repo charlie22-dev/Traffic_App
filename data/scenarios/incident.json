@@ -1,0 +1,8 @@
+{
+  "name": "incident",
+  "description": "Synthetic temporary near-zero speed on segment 3 of the first selected direction.",
+  "traffic_multiplier": 1.0,
+  "segment_multipliers": {"*": {"2": 0.85}},
+  "incident": {"route_code": null, "segment_sequence": 3, "start_seconds": 120, "duration_seconds": 120, "speed_multiplier": 0.02},
+  "is_simulated": true
+}

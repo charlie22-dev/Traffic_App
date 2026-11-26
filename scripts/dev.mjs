@@ -12,7 +12,7 @@ async function checkPort(port) {
   });
 }
 
-export async function startDev({ apiPort = 8000, webPort = 5173, handleSignals = true } = {}) {
+export async function startDev({ apiPort = 8000, webPort = 5173, handleSignals = true, quiet = false } = {}) {
   apiPort = await checkPort(apiPort);
   webPort = await checkPort(webPort);
   if (apiPort === webPort) webPort = await checkPort(0);
@@ -34,6 +34,7 @@ export async function startDev({ apiPort = 8000, webPort = 5173, handleSignals =
   ]) {
     const child = launch(command, args, folder, {
       detached: !windows,
+      stdio: quiet ? 'ignore' : 'inherit',
       env: { ...process.env, COMMUTELIVE_API_PROXY_TARGET: apiUrl },
     });
     children.push(child);

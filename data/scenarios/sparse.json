@@ -1,0 +1,9 @@
+{
+  "name": "sparse",
+  "description": "Synthetic sparse fleet: three vehicles where possible, while retaining one per selected direction.",
+  "traffic_multiplier": 1.0,
+  "vehicle_limit": 3,
+  "segment_multipliers": {},
+  "incident": null,
+  "is_simulated": true
+}

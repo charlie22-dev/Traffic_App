@@ -1,38 +1,15 @@
 import assert from 'node:assert/strict';
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
-import { readFileSync, writeFileSync } from 'node:fs';
-import { randomBytes, randomUUID } from 'node:crypto';
-import { join } from 'node:path';
+import { randomUUID } from 'node:crypto';
 import { setTimeout } from 'node:timers/promises';
-import { root, run } from './process.mjs';
 import { startDev } from './dev.mjs';
+import { prepareDemo } from './prepare-demo.mjs';
 
 // Local-only synthetic demo: no device GPS and no credentials sent off-machine.
 const argumentsList = process.argv.slice(2);
 const holdIndex = argumentsList.indexOf('--hold-seconds');
 const holdSeconds = holdIndex < 0 ? 15 : Number(argumentsList[holdIndex + 1]);
 if (!Number.isInteger(holdSeconds) || holdSeconds < 0 || holdSeconds > 60) throw new Error('--hold-seconds must be a whole number from 0 to 60.');
-await run('php', ['artisan', 'config:clear'], 'backend');
-const { stdout } = await promisify(execFile)('php', ['-r',
-  "require 'vendor/autoload.php'; $app = require 'bootstrap/app.php'; $app->make(Illuminate\\Contracts\\Console\\Kernel::class)->bootstrap(); echo json_encode(['password' => config('commutelive.demo_password'), 'environment' => app()->environment()]);"],
-{ cwd: join(root, 'backend'), windowsHide: true });
-const runtimeConfig = JSON.parse(stdout);
-if (!['local', 'testing'].includes(runtimeConfig.environment)) throw new Error('The synthetic demo runs only in local/testing environments.');
-let password = runtimeConfig.password;
-if (!password) {
-  password = randomBytes(24).toString('base64url');
-  const envPath = join(root, 'backend', '.env');
-  let contents = readFileSync(envPath, 'utf8');
-  contents = /^DEMO_PASSWORD=.*$/m.test(contents)
-    ? contents.replace(/^DEMO_PASSWORD=.*$/m, `DEMO_PASSWORD=${password}`)
-    : `${contents.trimEnd()}\nDEMO_PASSWORD=${password}\n`;
-  writeFileSync(envPath, contents);
-  console.log('Generated demo credentials in ignored backend/.env. Credentials and tokens are not printed.');
-}
-if (typeof password !== 'string' || password.length < 12) throw new Error('Set DEMO_PASSWORD to at least 12 characters in backend/.env.');
-await run('php', ['artisan', 'migrate', '--no-interaction'], 'backend');
-await run('php', ['artisan', 'db:seed', '--no-interaction'], 'backend');
+const password = await prepareDemo();
 const servers = await startDev({ apiPort: 0, webPort: 0, handleSignals: false });
 const stopRequested = new AbortController();
 const onStop = () => { console.log('Ending synthetic tracking…'); stopRequested.abort(); };

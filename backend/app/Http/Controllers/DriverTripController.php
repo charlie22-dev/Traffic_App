@@ -12,6 +12,13 @@ use Illuminate\Validation\Rule;
 
 class DriverTripController extends Controller
 {
+    public function active(Request $request): JsonResponse
+    {
+        $trip = \App\Models\Trip::where('active_driver_id', $request->user()->id)->first();
+
+        return response()->json(['data' => $trip, 'tracking_on' => $trip !== null]);
+    }
+
     public function vehicles(Request $request): JsonResponse
     {
         return response()->json(['data' => Vehicle::where('driver_id', $request->user()->id)->with('route:id,code,name,is_simulated')->get(['id', 'route_id', 'driver_id', 'label', 'mode', 'is_simulated'])->makeHidden('driver_id')]);

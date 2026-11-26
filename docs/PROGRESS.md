@@ -115,3 +115,24 @@ The team explicitly requested Phase 2 while the Phase 1 real-data gate remains o
 ### Remaining limits and questions
 
 Phase 1's actual pilot geometry/stops still need source data and visual validation. The synthetic line does not resolve that gate or provide measured traffic/ETA accuracy. Real Flutter tracking, permissions and persistent notifications remain in the driver-app phase. No field GPS collection or MySQL concurrent load test was performed. Configure the scheduler to enforce daily retention in any running deployment. Wait for **continue** before Phase 3.
+
+## Phase 3 — in progress, synthetic demonstration approved
+
+The team explicitly approved using the separate fictional route while retaining Phase 1's real-route validation gap.
+
+- Added Python CLI, pure seeded motion, spherical interpolation compatible with the backend distance convention, per-direction headways, configurable speed/hour/segment factors, stop approaches/dwell, noise, dropouts and occupancy.
+- Added normal/rush_hour/incident/sparse scenario JSON. The incident acts only on a chosen direction/segment during its configured simulation-time window; these are experimental assumptions, not measured conditions.
+- Added simulated-only local provisioning that stores tokens in ignored `simulator/.env`. Added private active-trip lookup to recover a lost start response, and a scoped emergency stop/revoke command that leaves other vehicles/drivers untouched.
+- Added per-driver nonblocking batched upload workers, bounded retries/outboxes, actual UTC recording timestamps, deterministic simulation-clock arrivals/sample CSVs and transport clock-link logs. Credentials never enter output artifacts.
+- Added a real HTTP wrapper that polls changing matched positions and verifies cleanup. Initial normal runs showed all three simulated vehicles moving through the public endpoint; synchronous transport was replaced with workers to reduce accelerated-playback lag. A 360-second synthetic run reached downstream stops and cleaned up tracking/tokens.
+- Focused tests: 14 Python tests (including byte-identical CSV replay, incident delay, dwell/noise/dropout independence and retry/start recovery), plus 4 provisioning/active-trip/cleanup PHP tests passed. Full-suite and final scenario checks remain pending.
+
+### Phase gate
+
+- [ ] Actual HTTP run shows changing vehicle positions.
+- [ ] Same seed/data/settings produce byte-identical arrival CSVs.
+- [ ] Incident produces an observable chosen-segment slowdown.
+- [ ] All emitted/stored simulated records are flagged.
+- [ ] Full repository suite passes.
+
+Real pilot geometry remains unverified/unimported; the simulator consumes stored route geometry and never invents missing road paths. Synthetic-demo authorization does not complete Phase 1.
