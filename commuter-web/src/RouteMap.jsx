@@ -17,7 +17,10 @@ export default function RouteMap({ route, segments, showTiles }) {
     } else {
       map.attributionControl.addAttribution('Route data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors / source shown above');
     }
-    const base = L.geoJSON(route.geometry_geojson, { style: { color: '#123c35', weight: 9, opacity: 0.45 } }).addTo(map);
+    const base = L.geoJSON(route.geometry_geojson, { style: { color: '#123c35', weight: 9, opacity: 0.45 } });
+    // Initialize the map view before attaching vector renderers, including in StrictMode.
+    map.fitBounds(base.getBounds(), { padding: [24, 24], maxZoom: 16 });
+    base.addTo(map);
     for (const [index, segment] of segments.entries()) {
       const layer = L.geoJSON(segment.polyline, { style: { color: colors[index % colors.length], weight: 5, opacity: 1 } }).addTo(map);
       const label = document.createElement('span');
@@ -32,7 +35,6 @@ export default function RouteMap({ route, segments, showTiles }) {
       label.textContent = `${stop.sequence}. ${stop.name} · ${stop.distance_along_route_m.toFixed(0)} m · ${stop.verification_status}`;
       marker.bindPopup(label);
     }
-    map.fitBounds(base.getBounds(), { padding: [24, 24], maxZoom: 16 });
     const observer = new ResizeObserver(() => map.invalidateSize());
     observer.observe(container.current);
     return () => { observer.disconnect(); map.remove(); };

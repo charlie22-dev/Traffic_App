@@ -2,16 +2,22 @@ import net from 'node:net';
 import { launch, stop, windows } from './process.mjs';
 
 async function checkPort(port) {
-  await new Promise((resolve, reject) => {
+  return await new Promise((resolve, reject) => {
     const server = net.createServer();
     server.once('error', () => reject(new Error(`Port ${port} is already in use. Stop the existing server before running dev.`)));
-    server.listen(port, '127.0.0.1', () => server.close(resolve));
+    server.listen(port, '127.0.0.1', () => {
+      const allocatedPort = server.address().port;
+      server.close(() => resolve(allocatedPort));
+    });
   });
 }
 
-export async function startDev() {
-  await checkPort(8000);
-  await checkPort(5173);
+export async function startDev({ apiPort = 8000, webPort = 5173 } = {}) {
+  apiPort = await checkPort(apiPort);
+  webPort = await checkPort(webPort);
+  if (apiPort === webPort) webPort = await checkPort(0);
+  const apiUrl = `http://127.0.0.1:${apiPort}`;
+  const webUrl = `http://127.0.0.1:${webPort}`;
   const children = [];
   let stopping = false;
   const close = () => {
@@ -23,10 +29,13 @@ export async function startDev() {
   let rejectDone;
   const done = new Promise((resolve, reject) => { resolveDone = resolve; rejectDone = reject; });
   for (const [command, args, folder] of [
-    ['php', ['artisan', 'serve', '--host=127.0.0.1', '--port=8000', '--tries=1'], 'backend'],
-    [process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', '5173', '--strictPort'], 'commuter-web'],
+    ['php', ['artisan', 'serve', '--host=127.0.0.1', `--port=${apiPort}`, '--tries=1'], 'backend'],
+    [process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', String(webPort), '--strictPort'], 'commuter-web'],
   ]) {
-    const child = launch(command, args, folder, { detached: !windows });
+    const child = launch(command, args, folder, {
+      detached: !windows,
+      env: { ...process.env, COMMUTELIVE_API_PROXY_TARGET: apiUrl },
+    });
     children.push(child);
     child.once('error', error => { close(); rejectDone(error); });
     child.once('exit', code => {
@@ -36,8 +45,8 @@ export async function startDev() {
   const onSignal = () => { close(); resolveDone(); };
   process.once('SIGINT', onSignal);
   process.once('SIGTERM', onSignal);
-  console.log('\nCommuteLive: http://127.0.0.1:5173 | API: http://127.0.0.1:8000/api/health\nPress Ctrl+C to stop both servers.');
-  return { done, close: () => {
+  console.log(`\nCommuteLive: ${webUrl} | API: ${apiUrl}/api/health\nPress Ctrl+C to stop both servers.`);
+  return { done, apiUrl, webUrl, close: () => {
     close();
     process.removeListener('SIGINT', onSignal);
     process.removeListener('SIGTERM', onSignal);

@@ -25,3 +25,7 @@ The team explicitly chose Malabon–Monumento instead of silently extending to t
 The successful Overpass query did not supply the exact pilot directions. Other requests failed or returned different services. No route was fabricated, inferred by shortest-path routing or copied blindly from historical GTFS. The importer, APIs and review page can be implemented/tested independently; the actual-data and visual-review gates remain pending until matching OSM data or the team's manual traces/stops are supplied. This is an unresolved requirement, not a completed-phase exception.
 
 The stop offset limit defaults to 100 m and segment length to 250 m in `config/commutelive.php`. The offset check catches visibly off-corridor input while allowing separately mapped roadside platforms; it does not establish legal/safe boarding locations. It must be tuned using local stop verification.
+
+## D006 — Isolate HTTP smoke ports (Phase 1)
+
+The HTTP smoke check now allocates separate free local ports and gives Vite its backend proxy target through the server-only `COMMUTELIVE_API_PROXY_TARGET` environment variable. Ordinary dev retains ports 8000/5173. Reason: the first full-suite run encountered an already-running dev server; tests should not stop it or accidentally verify a different process.

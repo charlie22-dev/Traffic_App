@@ -12,3 +12,14 @@ Retry bounded discovery manually with `python data/scripts/fetch_osm.py`; subseq
 If a matching current relation ID is found, export one direction with `python data/scripts/export_osm.py --relation-id ID --code MON-NAV-OUT`. This caches a dedicated query/response, verifies identity/from/to tags, joins only exactly connected member ways in their existing order, and writes GeoJSON plus the relation's named platform/stop nodes to `stops.csv`. It fails rather than bridging gaps, guessing boarding points or relabeling a different service. Review all outputs before import.
 
 Alternatively, trace each direction in geojson.io using local knowledge. Record source, license, date, unresolved road/terminal choices and actual stop names/coordinates in the documented input format. Outbound and inbound paths require separate verification.
+
+## Road-sequence leads supplied by the team
+
+The team supplied the following OSM-wiki road sequences as tracing references. These are textual leads, not GeoJSON or verified stop inventories. They do not replace the three selected pilot services.
+
+- T104: Malabon City Hall, Rizal Avenue Extension, P. Aquino Avenue, Dagat-Dagatan Avenue, C4 Road, Samson Road, Monumento. Preserve the agreed Monumento endpoint and flag the MCU/code mismatch.
+- T115 (reference only): Don Basilio Bautista Boulevard, L. Gutierez, M. Naval, A. Bonifacio, C. Arellano, Kalahi, General Luna, Governor Pascual Avenue, Araneta Avenue, Samson Road. Not added to the pilot.
+- T185 (reference only): Don Basilio Bautista Boulevard, F. Navarrete, Flamenco, J.P. Rizal, Paliwas Road, Obando. Not added to the pilot.
+- T105 and T107: listed without road sequences in the supplied wiki notes. Exact pilot T107 path, return direction and stops still require source data/local tracing.
+
+Street sequences help constrain a trace, but do not specify the exact lane/way at divided roads, all connecting turns, terminal loops or legal boarding points. No shortest-road guess was substituted for those missing details.

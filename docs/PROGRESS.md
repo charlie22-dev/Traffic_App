@@ -33,7 +33,7 @@ Goal: a local monorepo with a React page that displays API OK from Laravel.
 
 ### Running it
 
-From the repository root: `npm run setup`, then `npm run dev`; open http://127.0.0.1:5173. On Windows, `npm.cmd` works if PowerShell blocks npm.ps1. Stop dev before `npm test` so the integration-test ports are available. README contains six setup steps.
+From the repository root: `npm run setup`, then `npm run dev`; open http://127.0.0.1:5173. On Windows, `npm.cmd` works if PowerShell blocks npm.ps1. README contains six setup steps. Phase 1 updated the smoke check to allocate separate ports so `npm test` can now run alongside dev.
 
 ### Limits and open questions
 
@@ -60,7 +60,10 @@ Goal: source-backed pilot directions, ordered stops and configurable segments in
 - Added the Leaflet `/routes` review page with direction selection, provenance warnings, ordered stops, segment popups, optional OSM basemap and an honest empty-data state. Colors distinguish segment boundaries, not traffic.
 - Added cached Overpass discovery and strict OSM exporter scripts. The exporter refuses mismatched identities/directions, disconnected ways and unnamed/missing stops. It does not reverse an outbound route to invent an inbound route.
 - Added `data/pilot.json` with six pending directions and `data/stops.csv` with the required header. No fabricated geometry or boarding points have been imported. Local schema migrations passed.
-- Current focused verification: 26 backend tests (105 assertions), 11 React tests and the web production build passed. Full-suite and browser review are pending.
+- Final automated verification: **45 tests passed** (26 backend tests / 105 assertions, 12 React tests, 1 Flutter widget test, 2 simulator HTTP tests and 4 source-script tests), plus Flutter analysis, the production web build and real HTTP smoke checks for health/auth/routes/review-page serving.
+- The first full-suite smoke attempt found an existing server on port 8000. Updated test startup to allocate separate API/web ports and pass the API target to Vite on the server side; the final full suite passed while the existing dev servers kept running.
+- Edge browser QA at a 390 px viewport verified the actual empty database message. Browser-only intercepted synthetic responses exercised the real Leaflet renderer, two colored segments, stops, segment popup, basemap toggle and mobile overflow; no page errors remained. No synthetic data was imported. Browser QA caught an initialization-order bug, fixed by setting the view before vector attachment; a real-Leaflet StrictMode regression test now covers it.
+- The real-data acceptance gate remains unmet. Default `commutelive:import-routes` correctly fails with “No route GeoJSON files found” rather than inserting guessed routes/stops. The dev database has the schema, not a completed pilot dataset.
 
 ### Phase gate
 
@@ -69,8 +72,14 @@ Goal: source-backed pilot directions, ordered stops and configurable segments in
 - [x] Route list/detail/segment APIs return correct data in automated fixture tests.
 - [ ] A real approved pilot direction and its segments have been visually checked on Leaflet.
 - [x] Geometry tests including required edge cases pass.
-- [ ] Full repository suite passes with the final Phase 1 implementation.
+- [x] Full repository suite passes with the final Phase 1 infrastructure implementation.
 
 ### Required input
 
 Asked the team for exact matching OSM relation IDs or manually traced travel directions and stop coordinates. Supplied road names and route names do not uniquely define the path, one-way return loops, stop order or boarding locations. Keep the phase incomplete until source data resolves this gap. Do not begin Phase 2.
+
+The team subsequently supplied wiki road sequences for T104 and reference services T115/T185, and noted that T105/T107 have no road sequence there. Recorded these as tracing leads in `data/sources/README.md`; they do not supply exact coordinates or change the chosen services. Retain the earlier explicit Monumento-terminal decision.
+
+### Review and next step
+
+Use `npm.cmd run dev` and open http://127.0.0.1:5173/routes (or open that URL in the already-running development server). The default view is an honest empty-data state. Follow `data/README.md` to supply the six direction Features and actual stops. After importing and segmenting them, repeat idempotency/API checks against the actual dataset and visually check a real approved pilot route before marking Phase 1 complete. Phase 2 has not begun.
