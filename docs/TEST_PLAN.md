@@ -22,3 +22,11 @@ Later phases add simulation-label, consent, retention, GPS validation, route mat
 - Visibility/privacy: latest recording wins over delayed uploads, exact freshness boundary, no driver identity on public responses, simulation flags, occupancy expiry/trip isolation, incident identity/expiry, queued uploads after trip end stay hidden.
 - Retention/demo: purge dry-run, exact cutoff and invalid settings; daily schedule registration; idempotent synthetic seeder and model factories. The real local HTTP demo must show a matched vehicle and then turn tracking OFF/clean up its token.
 - Browser: actual seeded fictional line displays **Simulated data**, five segments and two stops at mobile width, with no page errors or horizontal page overflow. No physical device GPS is used.
+
+## Phase 3
+
+- Python geometry/physics: known distances and bends, exact headways/stop arrivals, configured dwell bounds/approach slowdown, mode/hour/segment factors, incident delay/recovery, sparse direction coverage, approximate 5 m noise, independent seed streams and intentional dropouts.
+- Deterministic output: compare arrival/sample CSV bytes for repeated seeds and speedups; noisy GPS must not alter true arrivals. Include runtime/input/engine fingerprints for audit. Wall-clock transport is deliberately separate.
+- HTTP/lifecycle: retry identical batches after transient errors, recover lost trip-start responses, refuse to take over an existing trip, provision only simulated identities, reject missing consent/synthetic-geometry authorization, and restrict fallback cleanup to the simulator pool.
+- Live acceptance: use the real API with 3 and 10 simulated vehicles; record changing matched public positions and incident near-zero speeds; end trips/revoke demo tokens afterward. Verify every stored simulator ping is flagged. Keep real-route field validation open while Phase 1 data is absent.
+- Run all four scenario CLIs; sparse must reduce the ten-vehicle fleet while preserving selected direction coverage. Compare normal/incident from one saved snapshot, not unrelated route datasets.

@@ -1,6 +1,6 @@
 # CommuteLive
 
-A free commute assistant for a small Philippine jeepney/bus pilot. The backend now supports driver authentication, consented trips, GPS batches, occupancy, incidents and live vehicle JSON. A separate **simulated** local demo exercises that loop. Real pilot geometry/stops remain pending from Phase 1; no field accuracy, traffic or ETA claims are made.
+A free commute assistant for a small Philippine jeepney/bus pilot. The backend supports driver authentication, consented trips, GPS batches, occupancy, incidents and live vehicle JSON. A seeded Python simulator drives explicitly **simulated** vehicles through that API. Real pilot geometry/stops remain pending from Phase 1; no field accuracy, traffic or ETA claims are made.
 
 ## Local setup (6 steps)
 
@@ -54,6 +54,17 @@ This local-only script generates a demo password in ignored `backend/.env` if ab
 Full endpoint/request/error details are in [docs/API.md](docs/API.md). `GET /api/vehicles?route_id=` hides stale samples after 60 seconds and ended trips immediately. `GET /api/incidents` returns unexpired reports. Role and trip/vehicle ownership are enforced; simulation flags come from the server. Driver registration cannot create an admin or assign a vehicle.
 
 Run `php artisan commutelive:purge-pings --dry-run` from `backend` to inspect expiry, and omit `--dry-run` to purge. Default retention is 30 days. Run `php artisan schedule:work` locally (or configure the Laravel scheduler on hosting) for the daily purge; the API dev server alone does not run scheduled jobs.
+
+## Moving simulator (Phase 3)
+
+```powershell
+npm.cmd run demo:simulator
+npm.cmd run demo:simulator -- --scenario incident --speedup 10
+```
+
+The approved fictional-route demo provisions simulated drivers/vehicles, runs the Python engine, observes changing positions in `GET /api/vehicles`, and turns all simulator tracking OFF afterward. It has normal, rush-hour, incident and sparse scenarios; seeded headways, stop dwell, GPS noise/dropouts and occupancy; and a deterministic `simulator/output/arrivals.csv` ground-truth log. Output data is simulated and ignored by Git. The moving vehicle map UI is still a later phase; current live verification uses public JSON.
+
+The full CLI is `python simulate.py --scenario normal --vehicles 10 --seed 42 --speedup 1` from `simulator` after provisioning. See [simulator setup, clocks and replay instructions](simulator/README.md). Defaults come from `backend/config/commutelive.php`. Arrival/sample CSVs use a reproducible simulation clock; API samples use real recording time with a separate clock-link log. Offline replay and `compare_scenarios.py` provide reproducible incident comparisons. Do not compare raw wall-clock predictions against accelerated arrival timestamps.
 
 ## Guardrails and next phase
 

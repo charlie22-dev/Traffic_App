@@ -22,7 +22,7 @@ class Route:
             raise ValueError("Route geometry must be a LineString")
         self.geometry = Polyline(data["geometry_geojson"]["coordinates"])
         self.length = float(data["length_m"])
-        if abs(self.geometry.length - self.length) > tolerance:
+        if not isfinite(self.length) or self.length <= 0 or abs(self.geometry.length - self.length) > tolerance:
             raise ValueError(f"Geometry length mismatch: {self.code}")
         self.stops = sorted(data["stops"], key=lambda item: item["sequence"])
         if len(self.stops) < 2:
@@ -30,13 +30,13 @@ class Route:
         previous = -1.0
         for index, stop in enumerate(self.stops):
             distance = float(stop["distance_along_route_m"])
-            if stop["sequence"] != index + 1 or distance < previous or distance < 0 or distance > self.length + tolerance:
+            if not isfinite(distance) or stop["sequence"] != index + 1 or distance < previous or distance < 0 or distance > self.length + tolerance:
                 raise ValueError(f"Invalid stop order/distance: {self.code}")
             previous = distance
         self.segments = sorted(segments, key=lambda item: item["sequence"])
         end = 0.0
         for index, segment in enumerate(self.segments):
-            if segment["sequence"] != index + 1 or abs(segment["start_m"] - end) > tolerance or segment["end_m"] <= segment["start_m"]:
+            if not all(isfinite(segment[key]) for key in ("start_m", "end_m")) or segment["sequence"] != index + 1 or abs(segment["start_m"] - end) > tolerance or segment["end_m"] <= segment["start_m"]:
                 raise ValueError(f"Invalid segment coverage: {self.code}")
             end = segment["end_m"]
         if not self.segments or abs(end - self.length) > tolerance:

@@ -26,3 +26,7 @@ The projects listed in the build brief remain candidates for review. Before rely
 ## Phase 2
 
 The auth/ingestion implementation is original application code using the existing MIT-licensed Laravel/Sanctum dependencies. Verified the installed Sanctum 4.5.0 `HasApiTokens::createToken` expiry signature before use. No code from the inspiration applications was copied. The separate demo geometry is a fictional straight test line created for local verification, not an imported OSM/GTFS route or measured vehicle trace; its provenance and simulation flags are explicit.
+
+## Phase 3
+
+The simulator implementation is original code using the Python standard library. Its spherical distance/interpolation convention follows this project's existing Laravel geometry helper (mean Earth radius 6,371,008.8 m); no reference application's simulator or route code was copied. Headways, mode speeds, hourly factors, dwell/noise/dropout values and incident multipliers are explicitly synthetic experiment settings, not sourced real measurements. Actual pilot geometry still requires the separately documented OSM/manual verification workflow.

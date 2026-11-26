@@ -66,6 +66,9 @@ class ProvisionSimulator extends Command
             if (is_link($path)) {
                 throw new RuntimeException('Refusing to replace a symbolic-link credentials file.');
             }
+            if (is_file($path.'.run.lock')) {
+                throw new RuntimeException('A simulator run lock exists. Stop/confirm the old process before changing its credentials.');
+            }
             $original = is_file($path) ? file_get_contents($path) : '';
             DB::transaction(function () use ($routes, $count, $path, $url, $original) {
                 $drivers = [];

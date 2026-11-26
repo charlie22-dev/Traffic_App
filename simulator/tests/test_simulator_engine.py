@@ -2,11 +2,13 @@ import csv
 import json
 import tempfile
 import unittest
+from math import sqrt
+from random import Random
 from argparse import Namespace
 from pathlib import Path
 
 from commutelive_sim.engine import Route, World
-from commutelive_sim.geometry import Polyline, haversine
+from commutelive_sim.geometry import Polyline, haversine, noisy_point
 from commutelive_sim.runner import run, select_fleet, validate
 from sim_fixtures import normal, parameters, route_input
 
@@ -77,8 +79,28 @@ class EngineTest(unittest.TestCase):
         scenario["segment_multipliers"] = {"*": {"2": 0.5}}
         simulation = world(settings, scenario, count=1)
         self.assertEqual(simulation.multiplier(simulation.vehicles[0].route, {"sequence": 2}, 0), 0.5)
+        settings["hourly_speed_factors"][7] = 0.5
+        self.assertEqual(simulation.multiplier(simulation.vehicles[0].route, {"sequence": 2}, 0), 0.25)
+        self.assertEqual(simulation.multiplier(simulation.vehicles[0].route, {"sequence": 2}, 3600), 0.5)
         events = events_until(simulation)
         self.assertTrue(any(0 < event["speed_kph"] <= 8 for event in events if event["type"] == "ping"))
+
+    def test_noise_has_about_five_meter_radial_rms(self):
+        random = Random(42)
+        point = [120.95, 14.65]
+        squared = [haversine(point, noisy_point(point, random.gauss(0, 5 / sqrt(2)), random.gauss(0, 5 / sqrt(2)))) ** 2 for _ in range(1000)]
+        rms = sqrt(sum(squared) / len(squared))
+        self.assertGreater(rms, 4.5)
+        self.assertLess(rms, 5.5)
+
+    def test_all_committed_scenarios_validate_and_rush_hour_delays_arrival(self):
+        directory = Path(__file__).resolve().parents[2] / "data/scenarios"
+        for path in directory.glob('*.json'):
+            validate(parameters(), json.loads(path.read_text(encoding='utf-8')))
+        scenario = json.loads((directory / "rush_hour.json").read_text(encoding="utf-8"))
+        baseline = [event for event in events_until(world(count=1)) if event["type"] == "arrival" and event["stop_sequence"] == 2][0]
+        congested = [event for event in events_until(world(scenario=scenario, count=1)) if event["type"] == "arrival" and event["stop_sequence"] == 2][0]
+        self.assertGreater(congested["elapsed_seconds"], baseline["elapsed_seconds"])
 
     def test_sparse_fleet_preserves_direction_coverage(self):
         assignments = [{"label": f"SIM-{i}", "route_code": "A" if i % 2 == 0 else "B"} for i in range(10)]

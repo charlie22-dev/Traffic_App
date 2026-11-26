@@ -27,11 +27,11 @@ def validate(parameters, scenario):
             raise ValueError(f"Invalid simulator parameter: {key}")
     if parameters["step_seconds"] > parameters["ping_interval_seconds"]:
         raise ValueError("step_seconds cannot exceed the GPS interval")
-    if not 0 <= parameters["dropout_probability"] <= 1 or parameters["gps_noise_rms_m"] < 0:
+    if not math.isfinite(parameters["dropout_probability"]) or not 0 <= parameters["dropout_probability"] <= 1 or not math.isfinite(parameters["gps_noise_rms_m"]) or parameters["gps_noise_rms_m"] < 0:
         raise ValueError("Invalid dropout/noise settings")
-    if not 0 <= parameters["dwell_min_seconds"] <= parameters["dwell_max_seconds"]:
+    if not all(math.isfinite(parameters[key]) for key in ("dwell_min_seconds", "dwell_max_seconds")) or not 0 <= parameters["dwell_min_seconds"] <= parameters["dwell_max_seconds"]:
         raise ValueError("Invalid dwell interval")
-    if not 0 < parameters["vehicle_speed_factor_min"] <= parameters["vehicle_speed_factor_max"]:
+    if not all(math.isfinite(parameters[key]) for key in ("vehicle_speed_factor_min", "vehicle_speed_factor_max")) or not 0 < parameters["vehicle_speed_factor_min"] <= parameters["vehicle_speed_factor_max"]:
         raise ValueError("Invalid speed-factor range")
     if len(parameters["hourly_speed_factors"]) != 24 or any(not math.isfinite(value) or value < 0 for value in parameters["hourly_speed_factors"]):
         raise ValueError("Hourly profile must contain 24 nonnegative finite factors")
@@ -41,11 +41,13 @@ def validate(parameters, scenario):
         if any(not math.isfinite(value) or value < 0 for value in factors.values()):
             raise ValueError("Invalid segment multiplier")
     incident = scenario.get("incident")
-    if incident and (incident["start_seconds"] < 0 or incident["duration_seconds"] <= 0 or not 0 <= incident["speed_multiplier"] <= 1):
+    if incident and (not all(math.isfinite(incident[key]) for key in ("start_seconds", "duration_seconds", "speed_multiplier")) or incident["start_seconds"] < 0 or incident["duration_seconds"] <= 0 or not 0 <= incident["speed_multiplier"] <= 1):
         raise ValueError("Invalid incident interval/multiplier")
     weights = parameters["occupancy_weights"]
-    if set(weights) != {"empty", "seats", "full"} or any(value < 0 for value in weights.values()) or sum(weights.values()) <= 0:
+    if set(weights) != {"empty", "seats", "full"} or any(not math.isfinite(value) or value < 0 for value in weights.values()) or sum(weights.values()) <= 0:
         raise ValueError("Invalid occupancy weights")
+    if any(not math.isfinite(value) or value <= 0 for value in parameters["free_flow_kph"].values()):
+        raise ValueError("Free-flow speeds must be positive finite assumptions")
 
 
 def select_fleet(assignments, requested, scenario):

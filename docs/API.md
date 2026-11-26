@@ -12,6 +12,7 @@ Base URL for ordinary local dev: `http://127.0.0.1:8000/api`. Send `Accept: appl
 | `GET /user` | Bearer token | Returns the authenticated user; password is omitted. |
 | `GET /privacy/tracking` | Public | Current notice version, GPS retention days and plain-language tracking notice. |
 | `GET /driver/vehicles` | Driver bearer token | Only that driver's assigned vehicles, including route and simulation status. |
+| `GET /driver/trips/active` | Driver bearer token | That driver's active trip or null, plus `tracking_on`. Used to recover a lost simulator trip-start response without starting a second trip. |
 | `POST /driver/trips/start` | `vehicle_id`, `tracking_consent: true`, `privacy_notice_version`, optional `start_battery_pct` (0–100) | Requires the current notice version and an owned vehicle with an active, segmented route. Returns 201 with `tracking_on: true`. One active trip per driver and per vehicle. |
 | `POST /driver/trips/{id}/end` | Optional `end_battery_pct` (0–100) | Owner only. Idempotent; first end time/battery are retained. Returns `tracking_on: false`. |
 
@@ -88,4 +89,12 @@ Once trips reference a route, import/build commands refuse actual geometry or se
 
 `npm.cmd run demo:ingestion` generates `DEMO_PASSWORD` in ignored `backend/.env` if absent, migrates, seeds and starts its own local servers. It creates four demo identities ending in `@commutelive.test`, two `SIM-JEEP-*` vehicles and `DEMO-SYNTHETIC-OUT` with explicitly fictional stops. The three pilot imports are untouched. Default `DatabaseSeeder` calls this same local/testing-only seeder; manual `php artisan db:seed` requires a local `DEMO_PASSWORD` of at least 12 characters. Reserved demo identities that collide with non-demo data are rejected rather than overwritten.
 
-The script logs in, explicitly starts synthetic tracking, submits one GPS record twice, checks one accepted/one duplicate, updates occupancy, verifies public visibility, holds tracking ON for 15 seconds, then ends the trip, confirms it is hidden, revokes its token and stops its servers. Use `--hold-seconds 0` for an immediate check or up to 60 seconds for manual inspection of the printed URLs. Credentials/tokens are not printed. This is a single-position ingestion demo, not the moving-vehicle simulator planned in Phase 3.
+The script logs in, explicitly starts synthetic tracking, submits one GPS record twice, checks one accepted/one duplicate, updates occupancy, verifies public visibility, holds tracking ON for 15 seconds, then ends the trip, confirms it is hidden, revokes its token and stops its servers. Use `--hold-seconds 0` for an immediate check or up to 60 seconds for manual inspection of the printed URLs. Credentials/tokens are not printed. This is a single-position ingestion demo; the separate Phase 3 simulator provides moving vehicles.
+
+## Phase 3 simulator provisioning
+
+The moving simulator is now available via root `npm.cmd run demo:simulator` and `simulator/simulate.py`; see `simulator/README.md`. It uses the same public/driver endpoints, and all simulated drivers, vehicles, trips and pings carry server-controlled simulation flags. It never bypasses trip consent, ownership, recording-time, quality or rate rules.
+
+`php artisan commutelive:provision-simulator --vehicles=10 --consent-simulated-tracking` provisions one simulated driver per vehicle across selected active non-synthetic directions. Use repeated `--route=CODE` to choose directions. Explicit fictional geometry additionally requires `--allow-synthetic-route`. Tokens and exported simulator parameters go into ignored `simulator/.env`, never stdout. Existing active or non-simulator identities are rejected. Configuration/re-provisioning must happen while the pool is OFF.
+
+`php artisan commutelive:stop-simulator` is a local/testing-only fallback: end simulator-pool trips and revoke only its named tokens. Real drivers, other namespaces and Phase 2 demo vehicles are excluded. The root wrapper invokes it even if a child process is interrupted. Re-provision after token revocation. Ordinary CLI runs retain reusable tokens until expiry/re-provisioning unless `--revoke-tokens` is requested.

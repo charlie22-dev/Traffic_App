@@ -116,7 +116,7 @@ The team explicitly requested Phase 2 while the Phase 1 real-data gate remains o
 
 Phase 1's actual pilot geometry/stops still need source data and visual validation. The synthetic line does not resolve that gate or provide measured traffic/ETA accuracy. Real Flutter tracking, permissions and persistent notifications remain in the driver-app phase. No field GPS collection or MySQL concurrent load test was performed. Configure the scheduler to enforce daily retention in any running deployment. Wait for **continue** before Phase 3.
 
-## Phase 3 — in progress, synthetic demonstration approved
+## Phase 3 — complete on approved synthetic demo (2026-11-26)
 
 The team explicitly approved using the separate fictional route while retaining Phase 1's real-route validation gap.
 
@@ -125,14 +125,28 @@ The team explicitly approved using the separate fictional route while retaining 
 - Added simulated-only local provisioning that stores tokens in ignored `simulator/.env`. Added private active-trip lookup to recover a lost start response, and a scoped emergency stop/revoke command that leaves other vehicles/drivers untouched.
 - Added per-driver nonblocking batched upload workers, bounded retries/outboxes, actual UTC recording timestamps, deterministic simulation-clock arrivals/sample CSVs and transport clock-link logs. Credentials never enter output artifacts.
 - Added a real HTTP wrapper that polls changing matched positions and verifies cleanup. Initial normal runs showed all three simulated vehicles moving through the public endpoint; synchronous transport was replaced with workers to reduce accelerated-playback lag. A 360-second synthetic run reached downstream stops and cleaned up tracking/tokens.
-- Focused tests: 14 Python tests (including byte-identical CSV replay, incident delay, dwell/noise/dropout independence and retry/start recovery), plus 4 provisioning/active-trip/cleanup PHP tests passed. Full-suite and final scenario checks remain pending.
+- Final suite passed: **98 tests** (64 backend / 349 assertions, 13 React, 1 Flutter widget, 16 simulator Python and 4 source-script tests), plus Flutter analysis, web build and HTTP smoke checks. Added a startup-lock provisioning guard and regression test before the final run. The Phase 2 ingestion demo also passed after extracting shared setup.
+- Actual normal HTTP demonstration with **10 vehicles**, seed 42, horizon 720 simulated seconds: all 10 were observed moving in public JSON; **515 pings accepted**, 4 intentional dropouts, 18 arrival events, 8 vehicles reached their final dwell/completion before the horizon. The other two were stopped/hidden correctly at the horizon. No records were falsely reported as complete arrivals.
+- The ten-vehicle run requested speedup 60 but took about 82.36 wall seconds including driver lifecycle/cleanup on the local server. This is not a claim of achieving 60× throughput; transport/server capacity remains the limiting factor. Truth remains deterministic.
+- Compared the actual online run with offline replays at speedups 1 and 60: **both arrivals.csv and samples.csv matched byte for byte**. Arrival SHA-256: `3492f0286d9daa15153b6b8acdd3d0745661e2905a3f18c0dee8a862502e6cef`; sample SHA-256: `3d55222ed42f66822e69452a7ce270c3683bb2c65693c63240fc61a87e6d274b`.
+- Final incident HTTP demo (3 vehicles, speedup 10) exposed about **0.35–0.38 kph** on the chosen segment in public JSON. Offline normal/incident comparison on the same snapshot produced mean affected-segment speeds about 18.26 vs 0.36 kph and arrival delays about 96.51 / 61.42 / 0 simulated seconds. These are synthetic scenario results, not field measurements.
+- Ran the remaining scenario CLIs offline: sparse reduced the ten-vehicle snapshot to 3 vehicles and logged 6 arrivals; rush-hour ran 10 vehicles with 14 arrivals within its selected horizon. All four scenario definitions validate.
+- Final audit after demonstration: **0 open simulator trips, 0 simulator tokens and 0 simulator pings mislabeled as real**. Generated credentials, lock files, arrival/sample/transport logs and run metadata are excluded from Git.
 
 ### Phase gate
 
-- [ ] Actual HTTP run shows changing vehicle positions.
-- [ ] Same seed/data/settings produce byte-identical arrival CSVs.
-- [ ] Incident produces an observable chosen-segment slowdown.
-- [ ] All emitted/stored simulated records are flagged.
-- [ ] Full repository suite passes.
+- [x] Actual HTTP run shows changing vehicle positions.
+- [x] Same seed/data/settings produce byte-identical arrival CSVs.
+- [x] Incident produces an observable chosen-segment slowdown.
+- [x] All emitted/stored simulated records are flagged.
+- [x] Full repository suite passes.
 
 Real pilot geometry remains unverified/unimported; the simulator consumes stored route geometry and never invents missing road paths. Synthetic-demo authorization does not complete Phase 1.
+
+### Run and review
+
+From root: `npm.cmd run demo:simulator`, or `npm.cmd run demo:simulator -- --scenario incident --speedup 10`. The full direct Python CLI/provisioning and byte-replay instructions are in `simulator/README.md`. Generated ground truth is `simulator/output/arrivals.csv`; `compare_scenarios.py` produces a reproducible synthetic slowdown report. Root demos leave tracking OFF and revoke their pool credentials.
+
+### Remaining limits / next phase
+
+Real pilot field validation still requires Phase 1's missing geometry/stops. Offline replay is deterministic for fixed inputs/runtime; wall-clock metadata and transport are deliberately not. Use the transport clock links for accelerated ETA evaluation, not raw subtraction of virtual arrivals from wall timestamps. The model has no car-following/physical overtaking, creates one one-way trip per vehicle and uses synthetic speed/dwell/load assumptions. Browser vehicle markers, measured ETA/traffic engines and field testing remain later phases. Phase 4 has not started; wait for **continue**.

@@ -64,6 +64,17 @@ try {
   const remaining = (await (await fetch(`${servers.apiUrl}/api/vehicles`)).json()).data.filter(item => item.label.startsWith('SIMULATOR-'));
   assert.equal(remaining.length, 0, 'All simulator vehicles must be hidden after cleanup');
   const result = { is_simulated: true, public_api_verified_moving: true, moving_vehicles: moved.length, observations: Object.fromEntries(observations) };
+  if (metadata.incident) {
+    const snapshot = JSON.parse(readFileSync(join(root, 'simulator/output/routes.json'), 'utf8'));
+    const targetRoute = snapshot.routes.find(item => item.data.code === metadata.incident.route_code);
+    const targetSegment = targetRoute.segments.find(item => item.sequence === metadata.incident.segment_sequence);
+    const bound = snapshot.parameters.free_flow_kph[targetRoute.data.mode] * snapshot.parameters.vehicle_speed_factor_max
+      * Math.max(...snapshot.parameters.hourly_speed_factors) * metadata.incident.speed_multiplier;
+    const low = [...observations.values()].map(record => record.segment_speeds[targetSegment.id]?.min_kph).filter(value => value > 0 && value <= bound + 1e-6);
+    assert.ok(low.length, 'Public API must expose a near-zero moving speed on the incident segment; lower speedup if transport skips the short observation window');
+    result.incident_observed_publicly = true;
+    result.incident_min_speed_kph = Math.min(...low);
+  }
   writeFileSync(join(root, 'simulator/output/live-verification.json'), JSON.stringify(result, null, 2));
   console.log(JSON.stringify(result, null, 2));
   console.log('Simulator HTTP demo passed; all owned tracking is OFF.');

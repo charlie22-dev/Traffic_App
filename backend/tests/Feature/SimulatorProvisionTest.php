@@ -86,4 +86,12 @@ class SimulatorProvisionTest extends TestCase
         $other = User::factory()->driver()->create();
         $this->actingAs($other, 'sanctum')->getJson('/api/driver/trips/active')->assertOk()->assertJsonPath('data', null)->assertJsonPath('tracking_on', false);
     }
+
+    public function test_provisioning_does_not_replace_credentials_during_run_startup(): void
+    {
+        file_put_contents($this->directory.'/.env.run.lock', '{"pid":123,"is_simulated":true}');
+        $this->artisan('commutelive:provision-simulator', $this->provisionOptions())->assertFailed();
+        $this->assertDatabaseCount('vehicles', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
 }
