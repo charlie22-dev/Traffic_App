@@ -1,0 +1,29 @@
+# Dependencies and generated artifacts
+**/node_modules/
+**/vendor/
+**/.venv/
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+**/dist/
+**/coverage/
+**/.dart_tool/
+**/build/
+# Local secrets and databases
+**/.env
+**/.env.*
+!**/.env.example
+**/auth.json
+**/*.sqlite
+**/*.sqlite-*
+**/local.properties
+**/key.properties
+**/*.jks
+**/*.keystore
+# Editors and runtime files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+.runtime/
