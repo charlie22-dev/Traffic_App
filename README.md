@@ -7,8 +7,8 @@ A free commute assistant for a small Philippine jeepney/bus pilot. The backend s
 1. Install free prerequisites: Git, PHP 8.2 or 8.3 with Composer 2 and `pdo_sqlite`, `mbstring`, `openssl`, `fileinfo`, `curl`, `dom`, `xml`; Node 22.12+ (Node 24 recommended); Python 3.11–3.13 with venv/pip; Flutter stable with Dart 3.13.5+. Keep their commands on PATH. Android Studio, its free Android SDK and a JDK are needed only to run/build the Android app. No service account or credit card is required.
 2. Clone this repository and open a terminal at its root.
 3. Run `npm run setup`. This installs locked dependencies, copies the backend environment template if needed, generates an app key once, migrates SQLite, resolves Flutter packages and creates `simulator/.venv`. Internet access is needed for dependency downloads. Existing local `.env` values are preserved; use `DB_CONNECTION=sqlite` for the default workflow.
-4. Run `npm run dev` and open **http://127.0.0.1:5173**. The page should display **API OK**. The API is at http://127.0.0.1:8000/api/health. This starts the API, frontend and scheduler; Ctrl+C stops those local processes.
-5. Run `npm test`. It runs backend tests, React tests/build, Flutter analysis/widget tests, Python tests and a real HTTP integration check. The integration check starts/stops its own servers on automatically allocated ports, so dev can remain running.
+4. Run `npm run dev` and open **http://127.0.0.1:5173**. The commuter map should load; the **Connection check** link at `/status` should display **API OK**. The API is at http://127.0.0.1:8000/api/health. This starts the API, frontend and scheduler; Ctrl+C stops those local processes.
+5. Run `npm test`. It runs backend tests, React tests, Flutter analysis/widget tests, Python tests, a production PWA build, Playwright mobile/offline checks, the ETA evaluation notebook and a real HTTP integration check. The integration check starts/stops its own servers on automatically allocated ports, so dev can remain running.
 6. Run `npm run demo:ingestion` for the synthetic driver-to-public API demo, or connect an Android device/emulator and run `cd driver-app`, then `flutter run` to view the starter. The Flutter starter still shows **Tracking OFF** and requests no GPS permission; real driver tracking UI arrives in a later phase.
 
 On Windows PowerShell, use `npm.cmd` instead of `npm` if script execution policy blocks npm.ps1. Do not change system execution policy. On Linux/macOS, the Python command is `python3`; on Windows it is `python`.
@@ -18,7 +18,7 @@ On Windows PowerShell, use `npm.cmd` instead of `npm` if script execution policy
 | Folder | Purpose |
 | --- | --- |
 | `backend` | Laravel 12, Sanctum bearer-token infrastructure, SQLite development database |
-| `commuter-web` | React + Vite connection screen; mobile layout |
+| `commuter-web` | React PWA, mobile commuter map, traffic, vehicles and stop ETAs |
 | `driver-app` | Android-only Flutter starter |
 | `simulator` | Seeded motion, scenario CLI and exact synthetic arrival logs |
 | `analysis` | Reproducible synthetic traffic/ETA evaluation notebook and replay |
@@ -62,9 +62,17 @@ npm.cmd run demo:simulator
 npm.cmd run demo:simulator -- --scenario incident --speedup 10
 ```
 
-The approved fictional-route demo provisions simulated drivers/vehicles, runs the Python engine, observes changing positions in `GET /api/vehicles`, and turns all simulator tracking OFF afterward. It has normal, rush-hour, incident and sparse scenarios; seeded headways, stop dwell, GPS noise/dropouts and occupancy; and a deterministic `simulator/output/arrivals.csv` ground-truth log. Output data is simulated and ignored by Git. The moving vehicle map UI is still a later phase; current live verification uses public JSON.
+The approved fictional-route demo provisions simulated drivers/vehicles, runs the Python engine, observes changing positions in `GET /api/vehicles`, and turns all simulator tracking OFF afterward. It has normal, rush-hour, incident and sparse scenarios; seeded headways, stop dwell, GPS noise/dropouts and occupancy; and a deterministic `simulator/output/arrivals.csv` ground-truth log. Output data is simulated and ignored by Git. Phase 5 adds a mobile commuter map with received-position animation, traffic and stop arrivals.
 
 The full CLI is `python simulate.py --scenario normal --vehicles 10 --seed 42 --speedup 1` from `simulator` after provisioning. See [simulator setup, clocks and replay instructions](simulator/README.md). Defaults come from `backend/config/commutelive.php`. Arrival/sample CSVs use a reproducible simulation clock; API samples use real recording time with a separate clock-link log. Offline replay and `compare_scenarios.py` provide reproducible incident comparisons. Do not compare raw wall-clock predictions against accelerated arrival timestamps.
+
+## Commuter map and installable PWA (Phase 5)
+
+Run `npm.cmd run dev` and open http://127.0.0.1:5173. Choose a direction, tap a stop for upcoming rides, and open a vehicle for occupancy, position age and stop ETA. Traffic comes from Phase 4; grey means unknown. The map has a legend and optional OSM basemap. Use my location runs only after a tap, stays in memory, and finds stops by straight-line distance; it is not walking guidance. Simulated records/geometry show an explicit badge and fictional-route notice.
+
+Run `npm.cmd run demo:commuter` for the self-contained real-simulator + 360px browser check, including actual demo API shutdown and cleanup. It uses its own ports and saves screenshots/verification under ignored `.runtime/phase5/`. For installation, keep the API running, then from `commuter-web` run `npm run build` and `npm run preview`; open http://127.0.0.1:4173 and use Install app/browser menu. HTTPS or localhost is required. Development mode does not register a service worker. See [commuter instructions](commuter-web/README.md) for interactive simulation and optional Android USB forwarding.
+
+The built PWA precaches its app shell/icons, and public static route snapshots allow a labeled offline view. It never caches live/authenticated feeds or OSM tiles. API errors retain the map with retry; vehicles expire locally and stale ETA countdowns pause. Component, race/freshness, privacy, mobile and offline/browser checks are in the root test suite. Physical-device installation and real pilot route coverage are not claimed by browser tests.
 
 ## Guardrails and next phase
 
@@ -74,6 +82,6 @@ Run `simulator/.venv/Scripts/python.exe analysis/run_notebook.py` on Windows, or
 
 No paid APIs or hosting. Keep secrets in ignored `.env` files; commit only `.env.example`. Do not commit local SQLite databases, APKs, dependency folders or virtual environments. Simulated records have `is_simulated = true`; the route review shows a **Simulated data** badge for the fictional demo geometry. API trip start requires explicit consent; the demo prints tracking ON/OFF. The persistent driver notification and GPS permission flow belong to the later Flutter phase. No commuter location is collected. Retention defaults to 30 days in `backend/config/commutelive.php`; a tested, scheduled purge command is included.
 
-The team supplied three pilot routes: Malabon–Monumento via Letre, Monumento–Navotas via Letre, and Gasak–Recto via Dagat-Dagatan/C-3. Their supplied codes, terminals and coverage are recorded in [pilot data notes](data/README.md); route identities and geometry still need verification before import. Route review, simulator and traffic/ETA APIs are implemented. The PWA, commuter live-map UI and alternate-routing engine remain later work. Work advances only after the current phase passes its checklist and the team says **continue**.
+The team supplied three pilot routes: Malabon–Monumento via Letre, Monumento–Navotas via Letre, and Gasak–Recto via Dagat-Dagatan/C-3. Their supplied codes, terminals and coverage are recorded in [pilot data notes](data/README.md); route identities and geometry still need verification before import. Route review, simulator, traffic/ETA APIs and the commuter PWA/live map are implemented. The Flutter driver flow and alternate-routing engine remain later work. Work advances only after the current phase passes its checklist and the team says **continue**.
 
 See [progress](docs/PROGRESS.md) for actual verification results and known issues. Backend CI runs on GitHub Actions for pushes and pull requests; GitHub applies its own free-tier quotas (public repositories have free standard hosted runners).

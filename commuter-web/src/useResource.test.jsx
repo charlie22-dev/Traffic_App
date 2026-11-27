@@ -44,3 +44,16 @@ it('a null resource finishes loading without a request', async () => {
   await waitFor(() => expect(result.current.loading).toBe(false));
   expect(fetch).not.toHaveBeenCalled();
 });
+
+it('automatically recovers a failed one-shot bootstrap request after an API restart', async () => {
+  vi.useFakeTimers();
+  const fetch = vi.fn().mockRejectedValueOnce(new Error('API down'))
+    .mockResolvedValue({ ok: true, json: async () => ({ data: { poll_interval_ms: 4000 } }) });
+  vi.stubGlobal('fetch', fetch);
+  const { result } = renderHook(() => useResource('/api/client-config'));
+  await act(async () => { await vi.advanceTimersByTimeAsync(1); });
+  expect(result.current.error).toBe('unavailable');
+  await act(async () => { await vi.advanceTimersByTimeAsync(4000); });
+  expect(result.current.error).toBe('');
+  expect(result.current.data.data.poll_interval_ms).toBe(4000);
+});

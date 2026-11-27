@@ -55,6 +55,13 @@ export default function App() {
   const nearby = useMemo(() => position ? nearestStops(position, stops, settings?.nearest_stop_limit ?? 0) : [], [position, stops, settings]);
   function retry() { config.retry(); inventory.retry(); geometry.retry(); vehiclesFeed.retry(); trafficFeed.retry(); arrivalsFeed.retry(); }
   function chooseRoute(value) { setRouteId(value); setStopId(null); setVehicleId(null); }
+  function revealOnPhone(selector) {
+    if (window.matchMedia?.('(max-width: 780px)').matches) requestAnimationFrame(() => {
+      document.querySelector(selector)?.scrollIntoView({ block: 'start', behavior: 'instant' });
+    });
+  }
+  function chooseMapStop(id) { setStopId(id); revealOnPhone('.arrivals-section'); }
+  function chooseVehicle(id) { setVehicleId(id); revealOnPhone('.vehicle-card'); }
   function locate() {
     if (!navigator.geolocation) { setLocationState('Location is unavailable in this browser. Choose a stop instead.'); return; }
     setLocationState('Finding nearby stops…');
@@ -74,26 +81,26 @@ export default function App() {
     <div className="page-intro"><div><p className="eyebrow">A little less guesswork</p><h1>Find your next sakay.</h1><p>Jeepneys, buses, and the stops ahead.</p></div>
       <div className="pilot-label">Local route pilot<span>{vehicles.length} recent {vehicles.length === 1 ? 'ride' : 'rides'}</span></div></div>
     {simulated && <div className="simulation-banner" role="note"><strong>Simulated data</strong><span>Demo rides and estimates are not real traffic measurements.{routes.some(r => r.is_simulated) ? ' This fictional route is not a boarding recommendation.' : ''}</span></div>}
-    {paused && <div className="connection-notice" role="alert"><div><strong>{!online ? 'You’re offline.' : 'We can’t reach live updates.'}</strong><p>Keep the saved route view. Positions will expire, and arrival estimates are paused. {lastUpdate && `Last updated ${ageLabel(Math.max(0, Math.floor((now - lastUpdate) / 1000)))}.`}</p></div><button className="quiet-button" onClick={retry}>Try again</button></div>}
+    {paused && <div className="connection-notice" role="alert"><div><strong>{!online ? 'You’re offline.' : 'We can’t reach live updates.'}</strong><p>You can still explore the route. Positions expire as they age; estimates pause without fresh updates. {lastUpdate && `Last updated ${ageLabel(Math.max(0, Math.floor((now - lastUpdate) / 1000)))}.`}</p></div><button className="quiet-button" onClick={retry}>Try again</button></div>}
     <div className="commute-layout"><section className="map-panel" aria-label="Explore your commute">
       <div className="map-toolbar"><label className="route-filter">Route direction<select value={routeId} onChange={event => chooseRoute(event.target.value)}><option value="all">All pilot directions</option>{routeList.map(route => <option value={route.id} key={route.id}>{route.name} · {route.direction}</option>)}</select></label>
         <button className="location-button" onClick={locate} disabled={!stops.length || locationState === 'Finding nearby stops…'}><span aria-hidden="true">⌖</span> Use my location</button></div>
       <LiveMap routes={routes} vehicles={vehicles} traffic={traffic} selectedStop={stop} selectedVehicleId={vehicleId} position={position} showTiles={showTiles}
-        animationMs={settings?.animation_ms ?? 0} onStop={setStopId} onVehicle={setVehicleId} />
+        animationMs={settings?.animation_ms ?? 0} onStop={chooseMapStop} onVehicle={chooseVehicle} />
       <div className="map-meta"><span>{loading ? 'Loading the pilot map…' : geometry.cached ? 'Saved route view' : `${routes.length} route ${routes.length === 1 ? 'direction' : 'directions'}`}</span><label><input type="checkbox" checked={showTiles} onChange={event => setShowTiles(event.target.checked)} /> Basemap</label></div>
       {!loading && !routes.length && <div className="empty-map" role="status"><strong>The pilot map is getting ready.</strong><p>{failed ? 'Route data is unavailable. Try again when connected.' : 'Routes and stops are still being verified. No service coverage is implied yet.'}</p></div>}
       <Legend />
       {routes.some(route => !route.is_simulated && route.verification_status !== 'field_verified') && <p className="verification-note">Route geometry needs local verification. Check current service and safe boarding places before travelling.</p>}
     </section>
     <aside className="ride-panel" id="ride-panel" aria-label="Stops and rides" tabIndex="-1">
-      <ArrivalsList stop={stop} arrivals={arrivals} loading={arrivalsFeed.loading} error={arrivalsFeed.error} fresh={etaFresh} now={now} onVehicle={setVehicleId} selectedVehicleId={vehicleId} onRetry={arrivalsFeed.retry} />
+      <ArrivalsList stop={stop} arrivals={arrivals} loading={arrivalsFeed.loading} error={arrivalsFeed.error} fresh={etaFresh} now={now} onVehicle={chooseVehicle} selectedVehicleId={vehicleId} onRetry={arrivalsFeed.retry} />
       <section className="stop-picker" aria-label="Choose a stop"><label htmlFor="stop-select">Choose a stop</label><select id="stop-select" value={stop?.id ?? ''} onChange={event => setStopId(Number(event.target.value) || null)}><option value="">Select a stop</option>{stops.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></section>
       {!!locationState && <div className="location-note" role="status"><p>{locationState}</p>{position && <button className="text-button" onClick={() => { setPosition(null); setLocationState(''); }}>Clear my location</button>}</div>}
       {!!nearby.length && <section className="nearby-stops" aria-label="Nearest stops"><h3>Near you</h3><p className="fine-print">Straight-line distance, not a walking route.</p><ul>{nearby.map(item => <li key={item.id}><button className="stop-row" onClick={() => setStopId(item.id)}><span>{item.name}{item.is_simulated && <small>Simulated stop</small>}</span><strong>{Math.round(item.distance_m)} m</strong></button></li>)}</ul></section>}
       {vehicle ? <VehicleCard vehicle={vehicle} route={routes.find(r => r.id === vehicle.route_id)} arrival={arrivals.find(a => a.vehicle_id === vehicle.id)} selectedStop={stop} now={now} etaFresh={etaFresh} onClose={() => setVehicleId(null)} />
         : vehicleId !== null ? <div className="inline-notice" role="status">This ride no longer has a fresh position.<button className="text-button" onClick={() => setVehicleId(null)}>Close vehicle details</button></div> : null}
       <section className="ride-list" aria-label="Recent vehicles"><div className="section-heading"><h3>On the route</h3><span>{vehicles.length}</span></div>{!vehicles.length && <p className="muted">No fresh vehicle positions right now. Routes can still be explored.</p>}
-        <ul>{vehicles.map(item => <li key={item.id}><button className={`ride-row ${item.id === vehicleId ? 'is-selected' : ''}`} onClick={() => setVehicleId(item.id)} aria-pressed={item.id === vehicleId}><span className="ride-glyph" aria-hidden="true">{item.mode === 'bus' ? 'B' : 'J'}</span><span><strong>{item.label}</strong><small>{occupancyLabels[item.occupancy] ?? occupancyLabels.unknown}</small></span><span className="position-age">{ageLabel(ageSeconds(item.recorded_at, now))}</span></button></li>)}</ul>
+        <ul>{vehicles.map(item => <li key={item.id}><button className={`ride-row ${item.id === vehicleId ? 'is-selected' : ''}`} onClick={() => chooseVehicle(item.id)} aria-pressed={item.id === vehicleId}><span className="ride-glyph" aria-hidden="true">{item.mode === 'bus' ? 'B' : 'J'}</span><span><strong>{item.label}</strong><small>{occupancyLabels[item.occupancy] ?? occupancyLabels.unknown}</small></span><span className="position-age">{ageLabel(ageSeconds(item.recorded_at, now))}</span></button></li>)}</ul>
       </section>
       <p className="privacy-note">Your location stays on this device. It is only used after you tap “Use my location” and is cleared on reload. Basemap tiles are requested from OpenStreetMap; you can turn them off.</p>
     </aside></div>

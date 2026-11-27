@@ -4,7 +4,7 @@ The home screen is a mobile-first Leaflet map with OSM attribution, traffic segm
 
 ## Run
 
-After root `npm run setup`, run root `npm run dev` and open `http://127.0.0.1:5173`. That starts API, web and scheduler. In PowerShell use `npm.cmd` if needed. Run root `npm run demo:commuter` for a self-contained real-simulator/browser acceptance check: it provisions only simulated drivers, checks 360px movement/traffic/countdown, intentionally stops its own API, verifies recovery UI, then ends the simulated trips/revokes tokens. The check uses its own ports and leaves unrelated servers alone. It finishes automatically and saves screenshots/JSON in ignored `commuter-web/test-results/`.
+After root `npm run setup`, run root `npm run dev` and open `http://127.0.0.1:5173`. That starts API, web and scheduler. In PowerShell use `npm.cmd` if needed. Run root `npm run demo:commuter` for a self-contained real-simulator/browser acceptance check: it provisions only simulated drivers, checks 360px movement/traffic/countdown, intentionally stops its own API, verifies recovery UI, then ends the simulated trips/revokes tokens. The check uses its own ports and leaves unrelated servers alone. It finishes automatically and saves screenshots/JSON in ignored `.runtime/phase5/`.
 
 For interactive moving data in an already-running root dev session, provision and run from separate terminals:
 

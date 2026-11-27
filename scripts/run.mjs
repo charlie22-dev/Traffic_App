@@ -35,7 +35,7 @@ async function test() {
   await run('php', ['artisan', 'test'], 'backend');
   await run('npm', ['test'], 'commuter-web');
   await run('npm', ['run', 'build'], 'commuter-web');
-  await run('npm', ['run', 'test:e2e'], 'commuter-web');
+  await run(process.execPath, ['node_modules/@playwright/test/cli.js', 'test'], 'commuter-web');
   await run('flutter', ['analyze'], 'driver-app');
   await run('flutter', ['test'], 'driver-app');
   await run(python, ['-m', 'unittest', 'discover', '-s', 'tests', '-v'], 'simulator');

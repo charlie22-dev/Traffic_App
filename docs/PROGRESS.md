@@ -199,10 +199,36 @@ From root: `npm.cmd run demo:eta` for authenticated HTTP demonstration; `npm.cmd
 Real pilot geometry/stops and field validation remain pending from Phase 1. Historical baselines and confidence need calibration with real consented data. Current aggregation weights pings, includes stop dwell, and may overstate congestion near stops; dwell allowance can double-count some delay. Confidence labels are heuristics. GPS-derived actual arrivals are approximate; large gaps remain unmatched. Repeated visits to the same stop ID within one trip require a future visit/sequence identity extension before loop services are evaluated. The approved synthetic directions have no repeated visits. No new user input is needed for the completed synthetic Phase 4 gates. Phase 5 has not started; stop and wait for **continue**.
 
 
-## Phase 5 - Commuter web app (in progress)
+## Phase 5 - Commuter web app (complete on approved synthetic scope)
 
 Goal: mobile-first commuter map with live vehicles/traffic/arrivals, local nearest-stop lookup, accessibility, offline handling and installable PWA. Scope follows the Phase 5 checklist in the local build brief. Preserve explicit synthetic provenance and pending Phase 1 real geometry validation.
 
 Implemented the commuter home screen, stable Leaflet map and animated received positions; traffic segments from Phase 4; route filter, stops, arrivals, occupancy/age/confidence vehicle card; local one-shot geolocation and clear-location control; verbal legends, keyboard alternatives, 44px controls, reduced motion; recoverable errors and expiring data. Public client settings share backend thresholds. Retained diagnostics at `/status` and source review at `/routes`. Production PWA caches only shell/static assets, with explicit static route snapshots for offline reload and a user-triggered version update.
 
 Initial checks: 26 React/component/hook tests pass, one backend config test passes, PWA build succeeds, and all three 360px Playwright tests pass (movement/countdown/filter/location privacy, API failure/offline expiry/reload, install manifest/icons and permission denial). Actual simulator + real API + browser demo passed with two simulated drivers; it showed changing markers, colored traffic, countdown ETA, vehicle card and no overflow/page errors. It killed only its owned API, retained the map and displayed friendly error/paused estimates; fallback ended two trips and revoked simulator tokens. Full-suite gate and final documentation are still pending.
+
+
+### Final Phase 5 verification
+
+- **135 tests passed**: 82 backend (441 assertions), 27 React/component/hook, 3 Playwright browser, 1 Flutter widget, 16 simulator, 4 source-script and 2 analysis metrics tests. Production PWA build, Flutter analysis, Phase 4 notebook and actual HTTP smoke also passed.
+- Production browser checks use 360x800 with real Leaflet and installed Edge: marker positions change after polls, stop arrivals count down, route filtering works, selected vehicle details show occupancy/freshness, and page width stays within the viewport. Component tests cover vehicle card, arrivals and verbal legend; race/freshness/offline tests cover the underlying hook and helpers.
+- Location privacy/denial checks pass. API requests and storage contain no user-location coordinates; denied permission leaves manual stop selection usable. Location clears on reload. Static route coordinates remain cached because they are public map data, not a commuter trace.
+- Offline reload serves the installed shell and labeled static route geometry, with no live markers or invented ETA. Traffic becomes grey; positions expire locally after the configured cutoff. Service-worker cache audit found no API or OSM tile entries. Manifest and 192/512px icons respond successfully; update flow is user-triggered.
+- Actual real-API/simulator browser check passed with two simulated drivers at speedup 4 and 360x800. It observed changing vehicle markers, sampled traffic colors and countdown ETA (first display 2m 01s), opened a vehicle card, then intentionally stopped only its owned API. The app retained the map, showed a friendly error and paused estimates. No page errors or horizontal overflow were observed. This demonstrates behavior, not accelerated ETA accuracy.
+- Post-demo database audit: **0 open simulator trips, 0 simulator tokens, 0 simulator pings mislabeled as real**. Other drivers/servers and pilot imports were untouched. Real demo screenshots and JSON evidence are in ignored `.runtime/phase5/`; fixture/browser outputs are in ignored `commuter-web/test-results/`.
+- Initial full-suite attempt found the existing Windows batch-argument guard rejecting the colon in `test:e2e`. The root runner now invokes Playwright's Node CLI directly, retaining the guard. The subsequent full run passed. Added a regression for one-shot config recovery after an API restart. A copy-only clarification after the run explains partial-feed failures without implying that all still-fresh estimates must pause.
+
+### Phase gate
+
+- [x] Phone-sized browser shows moving simulator vehicles, sampled traffic colors and countdown arrivals for a chosen stop.
+- [x] Actual demo API shutdown shows a friendly error and retained map, rather than a blank page.
+- [x] Vehicle card, arrivals list and legend have component coverage; browser smoke checks pass.
+- [x] Local one-shot location, route filters, verbal legends, simulation badges, keyboard alternatives and reduced motion are implemented.
+- [x] Production install manifest/service worker and offline shell/static-route reload are verified in a real browser.
+- [x] Full repository suite passes.
+
+### Run and remaining questions
+
+From root: `npm.cmd run dev` opens the commuter app at http://127.0.0.1:5173 (diagnostics/API OK at `/status`, source review at `/routes`). `npm.cmd run demo:commuter` performs the self-contained simulator/browser acceptance run and cleans up. To install, keep the API running and use `npm run build` then `npm run preview` from `commuter-web`; localhost preview is http://127.0.0.1:4173. See `commuter-web/README.md` for interactive simulator and optional Android USB forwarding instructions.
+
+Real pilot geometry/stops and field validation remain pending from Phase 1. Physical Android PWA installation has not been tested; browser install prerequisites/offline behavior are verified. HTTPS/localhost is needed for geolocation/service workers, so plain phone-to-LAN HTTP cannot promise those features. Reproducible browser QA blocks external tiles rather than claiming OSM availability. Traffic on real geometry remains real-only by default even if labeled simulated vehicles are visible; no silent source mixing is introduced. Phase 4's sparse/rush-hour ETA limitations and uncalibrated confidence still apply. No additional input is needed for the completed Phase 5 gates. Phase 6 has not started; stop and wait for **continue**.

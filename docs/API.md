@@ -1,5 +1,7 @@
 # CommuteLive API
 
+Phase 5: public `GET /api/client-config` returns only UI polling/request timeouts, ETA/vehicle/traffic freshness, static-route cache duration, marker interpolation duration and nearest-stop count. Values come from the `commuter` section and shared thresholds in `config/commutelive.php`; no environment secrets or driver identity are exposed. The commuter PWA uses existing public route/vehicle/traffic/arrivals endpoints and never uploads geolocation. See [commuter run/privacy/cache instructions](../commuter-web/README.md).
+
 Traffic and stop-arrival contracts, algorithms and scheduled operations are documented in [Phase 4 API details](TRAFFIC_ETA.md). Auth, ingestion and simulator provisioning follow below.
 
 Base URL for ordinary local dev: `http://127.0.0.1:8000/api`. Send `Accept: application/json`; POST/PUT bodies are JSON. Dates returned by the API are UTC with explicit timezone. Token responses contain credentials: keep them out of logs, screenshots and Git.

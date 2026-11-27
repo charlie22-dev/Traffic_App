@@ -17,7 +17,7 @@ let childDone = false;
 const interrupted = new AbortController();
 const onStop = () => { interrupted.abort(); child?.kill('SIGINT'); };
 process.once('SIGINT', onStop); process.once('SIGTERM', onStop);
-const output = join(root, 'commuter-web/test-results');
+const output = join(root, '.runtime/phase5');
 mkdirSync(output, { recursive: true });
 try {
   let ready = false;

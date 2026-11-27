@@ -51,6 +51,7 @@ export default function useResource(url, { interval = null, timeout = 8000, onli
         return;
       }
       running = true;
+      let failed = false;
       controller = new AbortController();
       guard = setTimeout(() => controller.abort(), timeout);
       try {
@@ -60,12 +61,14 @@ export default function useResource(url, { interval = null, timeout = 8000, onli
           setState({ url, data, loading: false, error: '', updatedAt: Date.now(), cached: false });
         }
       } catch {
+        failed = true;
         if (active) setState(previous => ({ ...previous, url, data: previous.data ?? cached?.data ?? null, loading: false,
           error: 'unavailable', cached: previous.cached || (!previous.data && !!cached), updatedAt: previous.updatedAt ?? cached?.savedAt ?? null }));
       } finally {
         clearTimeout(guard);
         running = false;
-        if (active && interval && !document.hidden) timer = setTimeout(load, interval);
+        // Bootstrap/static requests also recover from an API restart without a page reload.
+        if (active && (interval || failed) && !document.hidden) timer = setTimeout(load, interval || 4000);
       }
     }
     const resume = () => { if (!document.hidden) load(); else { clearTimeout(timer); } };

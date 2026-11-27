@@ -1,5 +1,11 @@
 # References and licensing
 
+## Phase 5
+
+- [Vite PWA strategies](https://vite-pwa-org.netlify.app/guide/service-worker-strategies-and-behaviors), [prompt update](https://vite-pwa-org.netlify.app/guide/prompt-for-update.html), and [generateSW exclusions](https://vite-pwa-org.netlify.app/workbox/generate-sw): shell precaching, manual version-update prompt and `/api` navigation exclusion. Installed `vite-plugin-pwa` 2.0.0 LICENSE is MIT. No external commute-app code was copied.
+- [Playwright browser channels](https://playwright.dev/docs/browsers): use installed Edge on Windows or bundled Chromium for repeatable mobile-viewport testing. Installed `@playwright/test` LICENSE is Apache 2.0. Browser fixtures are original explicitly synthetic records; actual simulator/HTTP checks are separate.
+- Existing Leaflet (BSD 2-Clause) and OSM attribution/tile-policy references above apply. No OSM bulk tile downloads, manual offline tile prefetch or tile service-worker cache were introduced. Icons are original project SVG/PNG graphics; no stock imagery or reference-app assets were imported.
+
 ## Phase 4
 
 - [Laravel 12 scheduling](https://laravel.com/docs/12.x/scheduling): verified sub-minute `everyThirtySeconds`, overlap locks and local `schedule:work`; original commands/services use the existing Laravel dependency. No reference application's traffic/ETA implementation was copied.
