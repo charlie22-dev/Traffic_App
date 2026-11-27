@@ -13,7 +13,7 @@ class SegmentBaseline extends Model
 
     protected function casts(): array
     {
-        return ['avg_speed_kph' => 'float', 'is_simulated' => 'boolean'];
+        return ['avg_speed_kph' => 'float', 'computed_at' => 'immutable_datetime', 'is_simulated' => 'boolean'];
     }
 }
 

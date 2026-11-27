@@ -13,7 +13,8 @@ class EtaPrediction extends Model
 
     protected function casts(): array
     {
-        return ['predicted_at' => 'immutable_datetime', 'predicted_arrival_at' => 'immutable_datetime', 'actual_arrival_at' => 'immutable_datetime', 'is_simulated' => 'boolean'];
+        return ['predicted_at' => 'immutable_datetime', 'predicted_arrival_at' => 'immutable_datetime', 'actual_arrival_at' => 'immutable_datetime',
+            'naive_arrival_at' => 'immutable_datetime', 'context' => 'array', 'is_simulated' => 'boolean'];
     }
 }
 

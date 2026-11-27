@@ -13,7 +13,7 @@ class SegmentSpeedStat extends Model
 
     protected function casts(): array
     {
-        return ['window_start' => 'immutable_datetime', 'avg_speed_kph' => 'float', 'is_simulated' => 'boolean'];
+        return ['window_start' => 'immutable_datetime', 'computed_at' => 'immutable_datetime', 'avg_speed_kph' => 'float', 'is_simulated' => 'boolean'];
     }
 }
 

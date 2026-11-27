@@ -26,6 +26,8 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:au
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::get('/vehicles', [LiveController::class, 'vehicles']);
 Route::get('/incidents', [LiveController::class, 'incidents']);
+Route::get('/traffic', [\App\Http\Controllers\TrafficController::class, 'traffic']);
+Route::get('/stops/{stop}/arrivals', [\App\Http\Controllers\TrafficController::class, 'arrivals'])->whereNumber('stop')->middleware('throttle:60,1');
 Route::get('/privacy/tracking', fn () => response()->json(['data' => [
     'version' => config('commutelive.privacy_notice_version'),
     'pings_retention_days' => config('commutelive.pings_retention_days'),

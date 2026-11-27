@@ -93,6 +93,7 @@ final class PingIngestor
                     : $this->duplicate($result, $ping, $hash);
             }
 
+            app(ArrivalMatcher::class)->reconcile($trip);
             return ['results' => $results, 'counts' => [
                 'accepted' => count(array_filter($results, fn ($row) => $row['status'] === 'accepted')),
                 'flagged_off_route' => count(array_filter($results, fn ($row) => $row['status'] === 'flagged_off_route')),

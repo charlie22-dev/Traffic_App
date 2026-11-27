@@ -150,3 +150,10 @@ From root: `npm.cmd run demo:simulator`, or `npm.cmd run demo:simulator -- --sce
 ### Remaining limits / next phase
 
 Real pilot field validation still requires Phase 1's missing geometry/stops. Offline replay is deterministic for fixed inputs/runtime; wall-clock metadata and transport are deliberately not. Use the transport clock links for accelerated ETA evaluation, not raw subtraction of virtual arrivals from wall timestamps. The model has no car-following/physical overtaking, creates one one-way trip per vehicle and uses synthetic speed/dwell/load assumptions. Browser vehicle markers, measured ETA/traffic engines and field testing remain later phases. Phase 4 has not started; wait for **continue**.
+
+
+## Phase 4 ? Traffic and ETA engines (in progress)
+
+Goal: turn matched pings into source-labeled segment speeds, traffic states and logged stop ETAs. Keep real pilot validation open and demonstrate on explicitly synthetic fixtures.
+
+Implemented trailing-window speed aggregation, daily historical baselines, source-isolated traffic API, blended partial-segment ETA integration, intermediate-stop dwell, trip-scoped GPS arrival reconciliation and logged public arrivals. Added the 30-second scheduler registration and development worker. First 14 backend tests pass (70 assertions); first four-scenario causal replay passes countdown and red-within-120s gates (red after 60s). Full-suite/notebook acceptance still pending. Early cold-start results improve MAE in normal/rush/incident but regress in sparse; no tuning or real-road claims.
