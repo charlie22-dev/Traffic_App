@@ -30,6 +30,7 @@ def evaluate(directory, seed=42, vehicles=5, duration=1200):
     snapshot = json.loads(subprocess.check_output(['php', str(ROOT / 'analysis/replay.php'), '--snapshot'], cwd=ROOT, text=True))
     snapshot['evaluation'] = {'duration_seconds': duration, 'seed': seed}
     results, gates = [], {}
+    normal_traffic = []
     for name in ('normal', 'rush_hour', 'incident', 'sparse'):
         case = directory / name
         case.mkdir(parents=True, exist_ok=True)
@@ -65,7 +66,12 @@ def evaluate(directory, seed=42, vehicles=5, duration=1200):
             delay = min(red) - incident['start_seconds'] if red else None
             gates['incident_red_delay_seconds'] = delay
             gates['incident_red_within_120_seconds'] = delay is not None and delay <= 120
+            control = next((s for s in normal_traffic if s['elapsed_seconds'] == min(red)
+                            and s['sequence'] == incident['segment_sequence'] and s['route_code'] == incident['route_code']), None) if red else None
+            gates['normal_control_status_at_incident_red'] = control['status'] if control else None
+            gates['incident_changes_control_to_red'] = control is not None and control['status'] in ('green', 'amber')
         if name == 'normal':
+            normal_traffic = replay['traffic']
             series = {}
             for p in replay['predictions']:
                 series.setdefault((p['vehicle'], p['stop']), []).append((datetime.fromisoformat(p['predicted_arrival_at']) - datetime.fromisoformat(p['predicted_at'])).total_seconds())
@@ -73,7 +79,7 @@ def evaluate(directory, seed=42, vehicles=5, duration=1200):
             gates['gps_matched_predictions'] = sum(p['gps_arrival_at'] is not None for p in replay['predictions'])
     if not all(r['n'] > 0 for r in results):
         raise RuntimeError('At least one scenario has no evaluable arrivals; increase the horizon.')
-    if not gates['incident_red_within_120_seconds'] or not gates['normal_has_countdown']:
+    if not gates['incident_red_within_120_seconds'] or not gates['incident_changes_control_to_red'] or not gates['normal_has_countdown']:
         raise RuntimeError(f'Phase gates failed: {gates}')
     fingerprint = hashlib.sha256()
     for path in sorted((ROOT / 'backend/app/Services').glob('*.php')):

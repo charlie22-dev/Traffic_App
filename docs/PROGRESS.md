@@ -152,7 +152,7 @@ From root: `npm.cmd run demo:simulator`, or `npm.cmd run demo:simulator -- --sce
 Real pilot field validation still requires Phase 1's missing geometry/stops. Offline replay is deterministic for fixed inputs/runtime; wall-clock metadata and transport are deliberately not. Use the transport clock links for accelerated ETA evaluation, not raw subtraction of virtual arrivals from wall timestamps. The model has no car-following/physical overtaking, creates one one-way trip per vehicle and uses synthetic speed/dwell/load assumptions. Browser vehicle markers, measured ETA/traffic engines and field testing remain later phases. Phase 4 has not started; wait for **continue**.
 
 
-## Phase 4 ? Traffic and ETA engines (in progress)
+## Phase 4 - Traffic and ETA engines (complete on approved synthetic scope)
 
 Goal: turn matched pings into source-labeled segment speeds, traffic states and logged stop ETAs. Keep real pilot validation open and demonstrate on explicitly synthetic fixtures.
 
@@ -160,3 +160,40 @@ Implemented trailing-window speed aggregation, daily historical baselines, sourc
 
 
 Phase 4 interim verification: 17 new backend tests now cover pure math, ingest-to-arrival reconciliation, partition/history isolation and returned-only logs. Four-scenario evaluation and actual notebook execution pass. Exact simulator truth gives cold-start MAE (blend/fixed, seconds): normal 29.37/33.06, rush 143.56/174.11, incident 33.70/41.73, sparse 32.92/26.65. Sparse regression is retained/reported. Incident red delay is 60 simulated seconds. Real HTTP demo passed with red mode-default traffic and ETA 123 -> 68 seconds, matched arrival and end/logout cleanup. No field accuracy claim. Full suite and clean-checkout notebook verification remain pending.
+
+
+### Final Phase 4 verification
+
+- **117 tests passed**: 81 backend (437 assertions), 13 React, 1 Flutter widget, 16 simulator, 4 source-script and 2 metrics tests. Web production build, Flutter analysis, notebook execution and real HTTP smoke all passed.
+- Four-scenario notebook executes from a fresh Git archive without backend/simulator environment files, SQLite database or prior output. Only installed Composer/Python dependencies were reused. It regenerates its own fictional fixture, exact simulator truth and predictions in disposable in-memory SQLite. Clean-checkout results match the main workspace.
+- Incident segment 3 turns red **60 simulated seconds** after incident start. At that timestamp, the same segment in the identical-seed normal control is amber with usable data; the strengthened control gate passes. Normal ETAs count down. All 132 normal predictions were matched to GPS-derived arrival records, while evaluation metrics independently use exact simulator ground truth.
+- Real HTTP demo passed twice: red traffic, `mode_free_flow_default`, fresh seats occupancy, logged ETA **123 -> 68 seconds**, reached-stop hiding, trip end and logout. Its deliberate position jumps are API smoke only, excluded from accuracy evaluation.
+- Cleanup audit: **0 open ETA-demo trips, 0 remaining driver tokens, 0 unflagged demo pings**, 4 predictions filled with approximate GPS arrival source/time. No real driver or pilot import was changed.
+- Notebook packages installed successfully after retrying one transient package-download timeout; `pip check` reports no broken requirements. Installed direct notebook package license metadata was checked (BSD 3-Clause).
+
+Seed 42 cold-start synthetic results (N is paired polling predictions, not independent trips):
+
+| Scenario | N | Blend MAE (s) | Fixed MAE (s) | Blend median error (s) | Blend within +/-60 s |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| normal | 132 | 29.37 | 33.06 | 23.85 | 87.12% |
+| rush_hour | 286 | 143.56 | 174.11 | 113.58 | 30.77% |
+| incident | 140 | 33.70 | 41.73 | 14.67 | 81.43% |
+| sparse | 76 | 32.92 | 26.65 | 26.91 | 86.84% |
+
+The notebook prints median and within-60 metrics for both methods, all flags and censored counts. This run has zero censored predictions. Sparse MAE regresses by 6.27 seconds; rush-hour estimates remain inaccurate despite relative improvement. These are measured simulator experiment results, not real road measurements or general performance guarantees. No tuning was done to conceal poor scenarios.
+
+### Phase gate
+
+- [x] Scheduled 30-second speed aggregation and daily historical baselines, with configurable windows/thresholds and explicit mode-default fallback.
+- [x] Public traffic and stop arrivals APIs, source isolation, occupancy/freshness, logged returned predictions and trip-scoped approximate arrival reconciliation.
+- [x] Incident red within one or two simulated minutes, confirmed against the normal control.
+- [x] Sensible approaching-vehicle ETA countdown observed through the API and simulator replay.
+- [x] Hand-calculated averaging, ratio, ETA and metric tests pass, including edge cases.
+- [x] Notebook runs without prior local data and prints across-scenario comparison table.
+- [x] Full repository suite passes.
+
+### Run and remaining questions
+
+From root: `npm.cmd run demo:eta` for authenticated HTTP demonstration; `npm.cmd run evaluate:eta` for the notebook; `npm.cmd run dev` for web/API plus scheduler. Outputs are under ignored `analysis/output/`; instructions and limitations are in `analysis/README.md` and `docs/TRAFFIC_ETA.md`.
+
+Real pilot geometry/stops and field validation remain pending from Phase 1. Historical baselines and confidence need calibration with real consented data. Current aggregation weights pings, includes stop dwell, and may overstate congestion near stops; dwell allowance can double-count some delay. Confidence labels are heuristics. GPS-derived actual arrivals are approximate; large gaps remain unmatched. Repeated visits to the same stop ID within one trip require a future visit/sequence identity extension before loop services are evaluated. The approved synthetic directions have no repeated visits. No new user input is needed for the completed synthetic Phase 4 gates. Phase 5 has not started; stop and wait for **continue**.
