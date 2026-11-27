@@ -33,6 +33,11 @@ try {
   const routes = await fetch(`${servers.webUrl}/api/routes`);
   assert.equal(routes.status, 200);
   assert.ok(Array.isArray((await routes.json()).data), 'Routes must return a JSON data array');
+  const traffic = await fetch(`${servers.webUrl}/api/traffic`);
+  assert.equal(traffic.status, 200);
+  const trafficBody = await traffic.json();
+  assert.ok(Array.isArray(trafficBody.data), 'Traffic must return a JSON data array');
+  assert.equal(typeof trafficBody.contains_simulated_data, 'boolean');
   const review = await fetch(`${servers.webUrl}/routes`);
   assert.equal(review.status, 200);
   console.log('HTTP smoke passed: React served, Laravel health proxied, protected endpoint rejects anonymous access.');

@@ -24,6 +24,7 @@ async function setup() {
   await run('flutter', ['pub', 'get'], 'driver-app');
   if (!existsSync(python)) await run(systemPython, ['-m', 'venv', '.venv'], 'simulator');
   await run(python, ['-m', 'pip', 'install', '-r', 'requirements.txt'], 'simulator');
+  await run(python, ['-m', 'pip', 'install', '-r', 'analysis/requirements.txt']);
   console.log('\nSetup complete. Run npm run dev, or npm test for all checks.');
 }
 
@@ -36,6 +37,8 @@ async function test() {
   await run('flutter', ['test'], 'driver-app');
   await run(python, ['-m', 'unittest', 'discover', '-s', 'tests', '-v'], 'simulator');
   await run(python, ['-m', 'unittest', 'discover', '-s', 'data/scripts/tests', '-v']);
+  await run(python, ['-m', 'unittest', 'discover', '-s', 'analysis/tests', '-v']);
+  await run(python, ['analysis/run_notebook.py']);
   await run(process.execPath, ['scripts/smoke.mjs']);
   console.log('\nAll automated checks passed. See docs/PROGRESS.md for phase acceptance gates.');
 }
@@ -43,9 +46,10 @@ async function test() {
 try {
   switch (process.argv[2]) {
     case 'setup': await setup(); break;
-    case 'dev': { const servers = await startDev(); await servers.done; break; }
+    case 'dev': { const servers = await startDev({ scheduler: true }); await servers.done; break; }
     case 'test': await test(); break;
-    default: throw new Error('Use: node scripts/run.mjs setup|dev|test');
+    case 'evaluate-eta': await run(python, ['analysis/run_notebook.py']); break;
+    default: throw new Error('Use: node scripts/run.mjs setup|dev|test|evaluate-eta');
   }
 } catch (error) {
   console.error(`\n${error.message}`);

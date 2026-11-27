@@ -1,5 +1,7 @@
 # Test plan
 
+Phase 4 acceptance: hand-calculated math/metrics; sample-window, simulation partition and baseline freshness/day coverage; ETA countdown/occupancy/lifecycle; returned-only prediction logging; out-of-order/duplicate batch arrival matching; long-gap rejection; scheduler frequency. Full suite also executes `analysis/eta_eval.ipynb` from generated fixtures in disposable in-memory SQLite. It prints paired four-scenario comparison metrics and verifies red within 120 simulated seconds and normal countdown. `npm run demo:eta` checks the real authenticated HTTP flow and OFF/token cleanup. The scripted HTTP position jumps are excluded from accuracy evaluation. See [traffic/ETA details](TRAFFIC_ETA.md) and [evaluation methodology](../analysis/README.md).
+
 Phase 0 must validate the public health JSON contract, rejection of unauthenticated API access, Sanctum bearer-token authentication, React loading/success/failure/retry behavior, the Flutter starter and Python environment. The full test command must also compile the web app.
 
 Before marking Phase 0 complete, run setup against a clean checkout with ignored dependencies and environment files absent, then launch dev and check the API through Vite's proxy. Record actual results in PROGRESS.md.

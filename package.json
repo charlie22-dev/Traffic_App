@@ -9,6 +9,8 @@
     "test": "node scripts/run.mjs test",
     "smoke": "node scripts/smoke.mjs",
     "demo:ingestion": "node scripts/demo-ingestion.mjs",
-    "demo:simulator": "node scripts/demo-simulator.mjs"
+    "demo:simulator": "node scripts/demo-simulator.mjs",
+    "demo:eta": "node scripts/demo-eta.mjs",
+    "evaluate:eta": "node scripts/run.mjs evaluate-eta"
   }
 }

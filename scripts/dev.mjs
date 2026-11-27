@@ -12,7 +12,7 @@ async function checkPort(port) {
   });
 }
 
-export async function startDev({ apiPort = 8000, webPort = 5173, handleSignals = true, quiet = false } = {}) {
+export async function startDev({ apiPort = 8000, webPort = 5173, handleSignals = true, quiet = false, scheduler = false } = {}) {
   apiPort = await checkPort(apiPort);
   webPort = await checkPort(webPort);
   if (apiPort === webPort) webPort = await checkPort(0);
@@ -28,10 +28,12 @@ export async function startDev({ apiPort = 8000, webPort = 5173, handleSignals =
   let resolveDone;
   let rejectDone;
   const done = new Promise((resolve, reject) => { resolveDone = resolve; rejectDone = reject; });
-  for (const [command, args, folder] of [
+  const processes = [
     ['php', ['artisan', 'serve', '--host=127.0.0.1', `--port=${apiPort}`, '--tries=1'], 'backend'],
     [process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', String(webPort), '--strictPort'], 'commuter-web'],
-  ]) {
+  ];
+  if (scheduler) processes.push(['php', ['artisan', 'schedule:work'], 'backend']);
+  for (const [command, args, folder] of processes) {
     const child = launch(command, args, folder, {
       detached: !windows,
       stdio: quiet ? 'ignore' : 'inherit',
@@ -48,7 +50,7 @@ export async function startDev({ apiPort = 8000, webPort = 5173, handleSignals =
     process.once('SIGINT', onSignal);
     process.once('SIGTERM', onSignal);
   }
-  console.log(`\nCommuteLive: ${webUrl} | API: ${apiUrl}/api/health\nPress Ctrl+C to stop both servers.`);
+  console.log(`\nCommuteLive: ${webUrl} | API: ${apiUrl}/api/health${scheduler ? ' | Scheduler ON' : ''}\nPress Ctrl+C to stop local processes.`);
   return { done, apiUrl, webUrl, close: () => {
     close();
     process.removeListener('SIGINT', onSignal);

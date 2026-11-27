@@ -136,6 +136,54 @@ class TrafficEtaTest extends TestCase
         $this->getJson('/api/stops/999999/arrivals')->assertNotFound();
     }
 
+    public function test_ingestion_reconciles_arrivals_after_out_of_order_batch_and_retry(): void
+    {
+        $prediction = EtaPrediction::factory()->create(['vehicle_id' => $this->trip->vehicle_id, 'trip_id' => $this->trip->id,
+            'stop_id' => $this->stop->id, 'predicted_at' => now()->subMinute()]);
+        $coordinates = $this->route->geometry_geojson['coordinates'];
+        $rows = [];
+        foreach ([[550, 0], [450, 10]] as [$distance, $age]) {
+            $point = \App\Support\Geometry::interpolate($coordinates[0], $coordinates[1], $distance / $this->route->length_m);
+            $rows[] = ['client_ping_uuid' => (string) \Illuminate\Support\Str::uuid(), 'lat' => $point[1], 'lng' => $point[0],
+                'accuracy_m' => 5, 'speed_kph' => 36, 'heading' => 90, 'recorded_at' => now()->subSeconds($age)->toIso8601String()];
+        }
+        $this->actingAs($this->trip->vehicle->driver, 'sanctum');
+        $payload = ['trip_id' => $this->trip->id, 'pings' => $rows];
+        $this->postJson('/api/driver/pings', $payload)->assertOk()->assertJsonPath('data.counts.accepted', 2);
+        $this->assertEqualsWithDelta(5, $prediction->fresh()->actual_arrival_at->diffInSeconds(now()), 1);
+        $this->postJson('/api/driver/pings', $payload)->assertOk()->assertJsonPath('data.counts.duplicates', 2);
+        $this->assertDatabaseCount('stop_arrivals', 1);
+        $this->assertTrue($prediction->fresh()->is_simulated);
+    }
+
+    public function test_history_expires_and_baseline_respects_weekend_and_source_partition(): void
+    {
+        $segment = $this->route->segments->first();
+        SegmentBaseline::create(['segment_id' => $segment->id, 'day_type' => 'weekday', 'hour' => 10, 'avg_speed_kph' => 12,
+            'sample_count' => 100, 'day_count' => 3, 'computed_at' => now(), 'is_simulated' => false]);
+        $url = '/api/traffic?route_id='.$this->route->id;
+        $this->getJson($url)->assertJsonPath('data.0.baseline_source', 'mode_free_flow_default');
+        $b = SegmentBaseline::create(['segment_id' => $segment->id, 'day_type' => 'weekday', 'hour' => 10, 'avg_speed_kph' => 16,
+            'sample_count' => 100, 'day_count' => 3, 'computed_at' => now(), 'is_simulated' => true]);
+        $this->getJson($url)->assertJsonPath('data.0.baseline_source', 'historical')->assertJsonPath('data.0.baseline_speed_kph', 16);
+        $b->update(['computed_at' => now()->subHours(37)]);
+        $this->getJson($url)->assertJsonPath('data.0.baseline_source', 'mode_free_flow_default');
+        $b->update(['computed_at' => now(), 'day_type' => 'weekend']);
+        $this->getJson($url)->assertJsonPath('data.0.baseline_source', 'mode_free_flow_default');
+    }
+
+    public function test_arrivals_limit_logs_only_displayed_rows_and_fresh_occupancy_is_returned(): void
+    {
+        $this->ping(['distance_along_route_m' => 100]);
+        \App\Models\VehicleStatus::create(['vehicle_id' => $this->trip->vehicle_id, 'trip_id' => $this->trip->id,
+            'occupancy' => 'seats', 'updated_at' => now(), 'is_simulated' => true]);
+        $second = Trip::factory()->create(['vehicle_id' => Vehicle::factory()->create(['route_id' => $this->route->id])->id]);
+        LocationPing::factory()->create(['trip_id' => $second->id, 'vehicle_id' => $second->vehicle_id, 'distance_along_route_m' => 50]);
+        config(['commutelive.eta.arrivals_limit' => 1]);
+        $this->getJson('/api/stops/'.$this->stop->id.'/arrivals')->assertJsonCount(1, 'data')->assertJsonPath('data.0.occupancy', 'seats');
+        $this->assertDatabaseCount('eta_predictions', 1);
+    }
+
     public function test_scheduler_registers_thirty_second_job(): void
     {
         $events = app(\Illuminate\Console\Scheduling\Schedule::class)->events();

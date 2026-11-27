@@ -1,5 +1,11 @@
 # References and licensing
 
+## Phase 4
+
+- [Laravel 12 scheduling](https://laravel.com/docs/12.x/scheduling): verified sub-minute `everyThirtySeconds`, overlap locks and local `schedule:work`; original commands/services use the existing Laravel dependency. No reference application's traffic/ETA implementation was copied.
+- [Jupyter nbconvert execution](https://nbconvert.readthedocs.io/en/stable/execute_api.html): notebook execution through `ExecutePreprocessor`; free dependencies isolated in the project's venv. Verified installed nbconvert 7.16.6, nbformat 5.10.4 and ipykernel 6.30.1 metadata: BSD 3-Clause licenses. Synthetic generation, causal replay and metrics are original code. No reference notebook, dataset or prediction code was imported.
+- Segment-average ratios, sample-count blending and dwell follow the team's supplied Phase 4 algorithm. Defaults/confidence and experiment settings are explicit assumptions, not calibrated Philippine measurements. Fictional geometry is project-created and makes no OSM/GTFS route claim.
+
 ## Phase 0
 
 - Laravel starter and framework: MIT; existing source retained. Framework license is included in the installed package (`backend/vendor/laravel/framework/LICENSE.md`). [Laravel source](https://github.com/laravel/laravel).
