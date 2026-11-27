@@ -21,6 +21,15 @@ return [
     'token_lifetime_minutes' => (int) env('TOKEN_LIFETIME_MINUTES', 1440),
     'privacy_notice_version' => '2026-11-26',
     'demo_password' => env('DEMO_PASSWORD'),
+    'commuter' => [
+        'poll_interval_ms' => 4000,
+        'routes_interval_ms' => 30000,
+        'request_timeout_ms' => 8000,
+        'eta_stale_seconds' => 12,
+        'route_cache_days' => 7,
+        'animation_ms' => 900,
+        'nearest_stop_limit' => 3,
+    ],
     'traffic' => [
         'window_seconds' => 300,
         'min_samples' => 3,

@@ -1,0 +1,119 @@
+.commuter-page { max-width: 1440px; padding: 24px 32px 20px; color: #163b34; }
+.commuter-page h1, .commuter-page h2, .commuter-page h3, .commuter-page p { margin: 0; }
+.commuter-page h1 { font-size: clamp(2.2rem, 4vw, 3.4rem); letter-spacing: -.055em; line-height: 1.12; margin: 8px 0 12px; }
+.commuter-page h2 { font-size: 1.4rem; line-height: 1.3; letter-spacing: -.025em; }
+.commuter-page h3 { font-size: 1rem; font-weight: 700; }
+.commuter-page ul { list-style: none; padding: 0; margin: 0; }
+.commuter-page button { transition: background-color 140ms ease, transform 140ms cubic-bezier(.23, 1, .32, 1); font-size: .9375rem; min-height: 44px; }
+.commuter-page button:active { transform: scale(.98); }
+.commuter-page :focus-visible { outline: 3px solid #a95500; outline-offset: 3px; }
+.commuter-page select { width: 100%; min-width: 0; min-height: 48px; font-size: 1rem; color: #173e35; padding: 10px 40px 10px 14px; appearance: none; background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6' fill='none' stroke='%23163b34' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 14px center; border: 1px solid #b8cac4; border-radius: 9px; text-overflow: ellipsis; }
+.commuter-header { justify-content: space-between; gap: 16px; padding-bottom: 22px; border-bottom: 1px solid #d7e3de; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 750; letter-spacing: -.04em; text-decoration: none; color: #163b34; font-size: 1.3rem; }
+.commuter-page .brand-mark { font-size: 2rem; line-height: 1; letter-spacing: -.08em; position: relative; padding-bottom: 4px; width: 40px; height: 40px; border-radius: 12px; }
+.brand-mark span { color: #b4f282; position: absolute; right: 8px; top: 0; }
+.header-actions { display: flex; gap: 16px; align-items: center; }
+.connection-pill { display: inline-flex; align-items: center; gap: 7px; font-size: .875rem; font-weight: 600; white-space: nowrap; }
+.connection-pill i { width: 7px; height: 7px; border-radius: 50%; background: #16774b; }
+.connection-pill.paused i { background: #a95500; }
+.commuter-page .quiet-button { background: white; color: #163b34; border: 1px solid #b8cac4; padding: 9px 14px; white-space: nowrap; }
+.install-control { position: relative; }
+.install-control p { position: absolute; z-index: 1100; right: 0; top: 52px; width: min(300px, 84vw); background: white; padding: 16px; border: 1px solid #b8cac4; box-shadow: 0 6px 24px #123c3514; font-size: .875rem; font-weight: 400; border-radius: 10px; }
+.page-intro { padding: 32px 0 26px; display: flex; align-items: end; justify-content: space-between; gap: 20px; }
+.page-intro > div > p:last-child { color: #526960; }
+.commuter-page .eyebrow { font-size: .75rem; letter-spacing: .11em; font-weight: 750; text-transform: uppercase; color: #567067; }
+.pilot-label { font-size: .875rem; border-left: 2px solid #b7d5c7; padding-left: 14px; white-space: nowrap; }
+.pilot-label span { display: block; color: #526960; margin-top: 3px; }
+.simulation-banner { display: flex; gap: 14px; align-items: center; border: 1px solid #dec38a; background: #fff8e9; color: #714700; border-radius: 10px; padding: 12px 16px; margin-bottom: 18px; font-size: .875rem; line-height: 1.5; }
+.simulation-banner strong { white-space: nowrap; border: 1px solid #c6a25f; border-radius: 5px; padding: 3px 7px; }
+.connection-notice { display: flex; gap: 16px; align-items: center; justify-content: space-between; background: #fff7ed; border-left: 3px solid #b66b00; padding: 16px; margin-bottom: 18px; font-size: .9375rem; }
+.connection-notice p { color: #674b28; margin-top: 4px; }
+.commute-layout { display: grid; grid-template-columns: minmax(0, 1fr) 370px; gap: 24px; align-items: start; }
+.map-panel { min-width: 0; }
+.map-toolbar { display: flex; gap: 12px; align-items: end; padding: 18px; background: white; border: 1px solid #d7e3de; border-radius: 14px 14px 0 0; border-bottom: 0; }
+.route-filter { font-size: .875rem; font-weight: 650; display: grid; gap: 6px; flex: 1; min-width: 0; }
+.location-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 0 0 auto; white-space: nowrap; padding: 11px 15px; height: 48px; }
+.location-button > span { font-size: 1.5rem; line-height: 1; }
+.live-map-wrap { position: relative; }
+.live-map { width: 100%; height: clamp(400px, 56vh, 650px); background: #e4ede8; border: 1px solid #d0ded7; }
+.live-map .leaflet-control-zoom a { width: 44px; height: 44px; line-height: 44px; color: #163b34; }
+.live-map .leaflet-control-attribution { font-size: 12px; line-height: 1.4; max-width: calc(100% - 4px); }
+.live-map .leaflet-marker-icon:focus { outline: 3px solid #a95500; outline-offset: 4px; }
+.tile-notice { position: absolute; top: 12px; left: 12px; max-width: calc(100% - 24px); z-index: 500; background: #ffffffef; border: 1px solid #c5d4ce; border-radius: 7px; padding: 8px 12px; color: #36554a; font-size: .8125rem; pointer-events: none; }
+.map-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 50px; padding: 4px 18px; font-size: .8125rem; color: #526960; background: white; border: 1px solid #d7e3de; border-top: 0; border-radius: 0 0 14px 14px; }
+.map-meta label { display: inline-flex; align-items: center; min-height: 44px; gap: 8px; cursor: pointer; font-size: .875rem; }
+.map-meta input { width: 18px; height: 18px; accent-color: #123c35; }
+.map-marker { background: transparent; border: 0; }
+.stop-marker { display: grid; place-items: center; margin: 4px; width: 36px; height: 36px; border: 3px solid #163b34; border-radius: 50%; background: #fff; color: #163b34; font-size: 14px; font-weight: 800; box-shadow: 0 1px 5px #123c352b; }
+.stop-marker.selected { background: #163b34; color: #fff; box-shadow: 0 0 0 5px #163b3433; }
+.vehicle-marker { width: 42px; height: 42px; display: grid; place-items: center; background: #123c35; border: 3px solid white; border-radius: 12px; box-shadow: 0 2px 6px #123c3550; position: relative; }
+.vehicle-marker.selected { outline: 3px solid #267b60; outline-offset: 3px; }
+.vehicle-marker b { position: absolute; right: -7px; top: -9px; border: 2px solid white; border-radius: 50%; background: #e3f1e9; font-size: 11px; color: #123c35; width: 20px; height: 20px; line-height: 16px; text-align: center; }
+.vehicle-marker.load-full b { background: #973737; color: white; }
+.vehicle-marker.load-unknown b { background: #5b6762; color: white; }
+.vehicle-drawing { display: block; width: 20px; height: 21px; border: 2px solid white; border-radius: 5px 5px 3px 3px; position: relative; }
+.vehicle-drawing::before { content: ''; position: absolute; left: 2px; right: 2px; top: 3px; height: 6px; background: #b4f282; border-radius: 1px; }
+.vehicle-drawing::after { content: ''; position: absolute; bottom: 2px; left: 2px; width: 3px; height: 3px; background: white; border-radius: 50%; box-shadow: 9px 0 white; }
+.vehicle-drawing i { position: absolute; width: 3px; height: 4px; background: white; bottom: -5px; left: 1px; }
+.vehicle-drawing i + i { left: auto; right: 1px; }
+.legend { margin-top: 12px; background: white; border: 1px solid #d7e3de; border-radius: 12px; }
+.legend summary { list-style: none; display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; min-height: 48px; cursor: pointer; font-size: .875rem; font-weight: 650; }
+.legend summary::-webkit-details-marker { display: none; }
+.legend summary::after { content: '+'; font-size: 1.25rem; }
+.legend[open] summary::after { content: '−'; }
+.legend > div { padding: 0 18px 16px; }
+.legend h3 { font-size: .875rem; margin-bottom: 8px; }
+.commuter-page .legend-items { display: flex; gap: 12px 18px; flex-wrap: wrap; font-size: .875rem; margin-bottom: 16px; }
+.legend-items li { display: flex; align-items: center; gap: 7px; }
+.traffic-line { display: inline-block; height: 5px; width: 20px; border-radius: 4px; }
+.traffic-green { background: #16774b; }.traffic-amber { background: #b66b00; }.traffic-red { background: #c43f3f; }.traffic-unknown { height: 0; border-top: 4px dashed #78817e; }
+.load-symbol { display: inline-grid; place-items: center; font-size: .75rem; width: 22px; height: 22px; border: 1px solid #849c90; border-radius: 4px; }
+.load-full { border-color: #a83e3e; }.load-unknown { border-style: dashed; }
+.ride-panel { background: white; border: 1px solid #d7e3de; border-radius: 14px; padding: 24px; min-width: 0; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.section-heading > span { font-size: .875rem; color: #526960; }
+.stop-glyph { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #b7cdc0; border-radius: 50%; font-weight: 750; }
+.commuter-page .muted { color: #526960; font-size: .9375rem; line-height: 1.65; }
+.arrivals-section > .muted { margin-top: 10px; }
+.commuter-page .arrivals-list { margin: 14px -10px 10px; }
+.commuter-page .arrival-row, .commuter-page .ride-row, .commuter-page .stop-row { border-radius: 9px; width: 100%; display: flex; align-items: center; gap: 12px; background: transparent; color: #163b34; text-align: left; padding: 12px 10px; border: 1px solid transparent; font-size: .875rem; font-weight: 400; }
+.commuter-page .is-selected { background: #edf6f0; border-color: #afccba; }
+.arrival-info { flex: 1; min-width: 0; }
+.arrival-info > span, .arrival-info small { display: block; color: #526960; font-size: .8125rem; line-height: 1.6; }
+.arrival-time { font-weight: 750; font-size: 1rem; white-space: nowrap; }
+.ride-glyph { display: grid; place-items: center; color: #16523e; border: 1px solid #c8dbce; background: #f1f7f2; border-radius: 9px; width: 34px; height: 38px; flex: 0 0 34px; font-size: 1rem; font-weight: 700; }
+.fine-print, .privacy-note { font-size: .8125rem; color: #526960; line-height: 1.6; }
+.stop-picker { margin-top: 22px; display: grid; gap: 7px; font-size: .875rem; font-weight: 650; }
+.location-note, .inline-notice { background: #f3f7f4; border-radius: 8px; padding: 12px; font-size: .875rem; color: #36554a; margin-top: 14px; }
+.commuter-page .text-button { color: #175c43; text-decoration: underline; text-underline-offset: 3px; background: transparent; border: 0; padding: 7px 0; font-size: .875rem; }
+.nearby-stops { margin-top: 22px; }
+.nearby-stops ul { margin: 8px -10px 0; }
+.stop-row > span { flex: 1; }
+.stop-row small { display: block; color: #714700; }
+.stop-row > strong { white-space: nowrap; font-size: .8125rem; }
+.vehicle-card { padding-top: 22px; margin-top: 22px; border-top: 1px solid #d7e3de; }
+.commuter-page .icon-button { padding: 0; width: 44px; height: 44px; min-height: 44px; background: #f1f6f3; color: #36554a; font-size: 1.4rem; border-radius: 50%; }
+.route-caption { font-size: .875rem; margin-top: 7px !important; }
+.route-caption > span { color: #526960; }
+.simulation-tag { display: inline-block; font-size: .75rem; font-weight: 650; color: #714700; background: #fff4dc; padding: 2px 7px; border-radius: 4px; margin-top: 10px; }
+.vehicle-facts { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: .8125rem; margin: 14px 0; color: #526960; }
+.occupancy { border: 1px solid #a9c9b7; background: #f0f7f2; color: #174e37; border-radius: 5px; padding: 3px 7px; }
+.occupancy-full { color: #973737; border-color: #cfa9a9; background: #fff5f5; }.occupancy-unknown { color: #526960; background: #f4f5f4; border-color: #bac5bf; }
+.vehicle-eta { padding: 14px; background: #f1f7f3; border-radius: 8px; display: grid; gap: 5px; font-size: .875rem; }
+.vehicle-eta strong { font-size: 1.5rem; }.vehicle-eta small { color: #526960; font-size: .75rem; }
+.ride-list { border-top: 1px solid #d7e3de; padding-top: 22px; margin-top: 22px; }
+.ride-list ul { margin: 6px -10px 0; }
+.ride-row > span:nth-child(2) { flex: 1; min-width: 0; }.ride-row strong { overflow-wrap: anywhere; }
+.ride-row small { display: block; color: #526960; font-size: .8125rem; }
+.position-age { white-space: nowrap; font-size: .75rem; color: #526960; }
+.privacy-note { border-top: 1px solid #d7e3de; padding-top: 18px; margin-top: 22px !important; }
+.empty-map, .verification-note { background: white; padding: 16px; margin-top: 12px !important; border: 1px solid #d7e3de; border-radius: 10px; font-size: .875rem; }
+.empty-map p { color: #526960; margin-top: 6px; }
+.commuter-footer { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; padding-top: 22px; margin-top: 12px; }
+.commuter-footer nav { display: flex; gap: 20px; }.commuter-footer a { color: #526960; display: inline-flex; align-items: center; min-height: 44px; }
+.skip-link { position: absolute; top: -100px; left: 16px; z-index: 2000; background: white; padding: 12px; }.skip-link:focus { top: 12px; }
+@media (hover: hover) and (pointer: fine) { .commuter-page .arrival-row:hover, .commuter-page .ride-row:hover, .commuter-page .stop-row:hover, .commuter-page .quiet-button:hover { background: #edf4ef; } }
+@media (max-width: 1100px) { .commute-layout { grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; }.map-toolbar { flex-wrap: wrap; }.location-button { width: 100%; }.ride-panel { padding: 20px; } }
+@media (max-width: 780px) { .commuter-page { padding: 18px 16px; }.commute-layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }.page-intro { padding: 26px 0 22px; }.pilot-label { display: none; }.live-map { height: 45vh; min-height: 340px; max-height: 500px; }.map-toolbar { padding: 14px; }.map-meta { padding-inline: 14px; }.route-filter { flex-basis: 100%; }.simulation-banner { align-items: start; flex-direction: column; gap: 8px; padding: 12px 14px; }.connection-notice { align-items: start; flex-direction: column; gap: 10px; }.ride-panel { padding: 20px; }.commuter-page .eyebrow { font-size: .75rem; } }
+@media (max-width: 430px) { .commuter-header { flex-wrap: wrap; padding-bottom: 16px; gap: 12px; }.header-actions { width: 100%; justify-content: space-between; }.header-actions .quiet-button { padding: 7px 12px; }.page-intro h1 { font-size: 2.25rem; }.arrival-row { gap: 8px !important; }.arrival-time { font-size: .9375rem; } }
+@media (prefers-reduced-motion: reduce) { .commuter-page button { transition: none; }.commuter-page button:active { transform: none; } }

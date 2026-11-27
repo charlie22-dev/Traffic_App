@@ -20,6 +20,7 @@ export async function startDev({ apiPort = 8000, webPort = 5173, handleSignals =
   const webUrl = `http://127.0.0.1:${webPort}`;
   const children = [];
   let stopping = false;
+  let apiStoppedForCheck = false;
   const close = () => {
     if (stopping) return;
     stopping = true;
@@ -42,7 +43,7 @@ export async function startDev({ apiPort = 8000, webPort = 5173, handleSignals =
     children.push(child);
     child.once('error', error => { close(); rejectDone(error); });
     child.once('exit', code => {
-      if (!stopping) { close(); rejectDone(new Error(`${folder} exited unexpectedly (${code}).`)); }
+      if (!stopping && !(apiStoppedForCheck && args[1] === 'serve')) { close(); rejectDone(new Error(`${folder} exited unexpectedly (${code}).`)); }
     });
   }
   const onSignal = () => { close(); resolveDone(); };
@@ -51,7 +52,10 @@ export async function startDev({ apiPort = 8000, webPort = 5173, handleSignals =
     process.once('SIGTERM', onSignal);
   }
   console.log(`\nCommuteLive: ${webUrl} | API: ${apiUrl}/api/health${scheduler ? ' | Scheduler ON' : ''}\nPress Ctrl+C to stop local processes.`);
-  return { done, apiUrl, webUrl, close: () => {
+  return { done, apiUrl, webUrl,
+    // Only an explicit test/demo call stops the owned API while retaining the web app.
+    stopApiForCheck: () => { apiStoppedForCheck = true; stop(children[0]); },
+    close: () => {
     close();
     process.removeListener('SIGINT', onSignal);
     process.removeListener('SIGTERM', onSignal);

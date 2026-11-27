@@ -2,7 +2,9 @@
   "name": "commutelive",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22.12.0" },
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "setup": "node scripts/run.mjs setup",
     "dev": "node scripts/run.mjs dev",
@@ -11,6 +13,7 @@
     "demo:ingestion": "node scripts/demo-ingestion.mjs",
     "demo:simulator": "node scripts/demo-simulator.mjs",
     "demo:eta": "node scripts/demo-eta.mjs",
-    "evaluate:eta": "node scripts/run.mjs evaluate-eta"
+    "evaluate:eta": "node scripts/run.mjs evaluate-eta",
+    "demo:commuter": "node scripts/demo-commuter.mjs"
   }
 }

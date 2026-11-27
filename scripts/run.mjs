@@ -2,6 +2,7 @@ import { existsSync, copyFileSync, readFileSync, openSync, closeSync } from 'nod
 import { join } from 'node:path';
 import { root, run, python, windows } from './process.mjs';
 import { startDev } from './dev.mjs';
+import { ensureBrowser } from './browser.mjs';
 
 async function setup() {
   // Verify tools before installing; don't install or replace system runtimes.
@@ -21,6 +22,7 @@ async function setup() {
   await run('php', ['artisan', 'config:clear'], 'backend');
   await run('php', ['artisan', 'migrate', '--no-interaction'], 'backend');
   await run('npm', ['ci', '--no-fund', '--no-audit'], 'commuter-web');
+  await ensureBrowser();
   await run('flutter', ['pub', 'get'], 'driver-app');
   if (!existsSync(python)) await run(systemPython, ['-m', 'venv', '.venv'], 'simulator');
   await run(python, ['-m', 'pip', 'install', '-r', 'requirements.txt'], 'simulator');
@@ -33,6 +35,7 @@ async function test() {
   await run('php', ['artisan', 'test'], 'backend');
   await run('npm', ['test'], 'commuter-web');
   await run('npm', ['run', 'build'], 'commuter-web');
+  await run('npm', ['run', 'test:e2e'], 'commuter-web');
   await run('flutter', ['analyze'], 'driver-app');
   await run('flutter', ['test'], 'driver-app');
   await run(python, ['-m', 'unittest', 'discover', '-s', 'tests', '-v'], 'simulator');

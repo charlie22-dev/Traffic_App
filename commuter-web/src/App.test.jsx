@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import App from './App.jsx';
+import App from './HealthCheck.jsx';
 
 const healthy = () => Promise.resolve({ ok: true, json: async () => ({ status: 'ok', service: 'CommuteLive API' }) });
 

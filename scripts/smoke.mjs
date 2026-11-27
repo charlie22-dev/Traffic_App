@@ -25,7 +25,7 @@ try {
   const page = await fetch(servers.webUrl);
   assert.equal(page.status, 200);
   assert.match(await page.text(), /src\/main\.jsx/);
-  const app = await fetch(`${servers.webUrl}/src/App.jsx`);
+  const app = await fetch(`${servers.webUrl}/src/HealthCheck.jsx`);
   assert.equal(app.status, 200);
   assert.match(await app.text(), /API OK/);
   const unauthorized = await fetch(`${servers.webUrl}/api/user`, { headers: { Accept: 'application/json' } });

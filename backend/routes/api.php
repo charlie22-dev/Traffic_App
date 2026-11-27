@@ -14,6 +14,11 @@ Route::get('/health', fn () => response()->json([
     'service' => 'CommuteLive API',
 ]))->name('api.health');
 
+Route::get('/client-config', fn () => response()->json(['data' => config('commutelive.commuter') + [
+    'vehicle_stale_seconds' => config('commutelive.vehicle_stale_seconds'),
+    'traffic_stale_seconds' => config('commutelive.traffic.stats_stale_seconds'),
+]]));
+
 Route::get('/user', fn (Request $request) => $request->user())
     ->middleware('auth:sanctum');
 
